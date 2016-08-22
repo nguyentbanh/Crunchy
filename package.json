@@ -1,6 +1,7 @@
 {
   "author": "Godzil",
   "description": "Crunchy.js is a fork of Crunchyroll.js, capable of downloading anime episodes from the popular CrunchyRoll streaming service.",
+  "license": "MIT",
   "keywords": [
     "anime",
     "download",
