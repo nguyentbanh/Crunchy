@@ -1,7 +1,7 @@
 interface IEpisodePage {
   id: number;
-  episode: number;
+  episode: string;
   series: string;
-  volume: number;
+  volume: string;
   swf: string;
 }

@@ -38,7 +38,8 @@ function complete(message: string, begin: number, done: (err: Error) => void) {
  */
 function download(config: IConfig, page: IEpisodePage, player: IEpisodePlayer, done: (err: Error) => void) {
   var series = config.series || page.series;
-  var fileName = name(config, page, series);
+  series = series.replace("/","_").replace("'","_");
+  var fileName = name(config, page, series).replace("/","_").replace("'","_");
   var filePath = path.join(config.output || process.cwd(), series, fileName);
   mkdirp(path.dirname(filePath), (err: Error) => {
     if (err) return done(err);
@@ -97,10 +98,12 @@ function downloadVideo(config: IConfig,
  * Names the file based on the config, page, series and tag.
  */
 function name(config: IConfig, page: IEpisodePage, series: string) {
-  var episode = (page.episode < 10 ? '0' : '') + page.episode;
-  var volume = (page.volume < 10 ? '0' : '') + page.volume;
+	var episodeNum = parseInt(page.episode, 10);
+	var volumeNum = parseInt(page.volume, 10);
+  var episode = (episodeNum < 10 ? '0' : '') + page.episode;
+  var volume = (volumeNum < 10 ? '0' : '') + page.volume;
   var tag = config.tag || 'CrunchyRoll';
-  return series + ' ' + volume + 'x' + episode + ' [' + tag + ']';
+  return series + ' ' + volume + 'x' + episode + ' [' + tag + ']';  
 }
 
 /**
@@ -122,15 +125,29 @@ function scrapePage(config: IConfig, address: string, done: (err: Error, page?: 
     if (err) return done(err);
     var $ = cheerio.load(result);
     var swf = /^([^?]+)/.exec($('link[rel=video_src]').attr('href'));
-    var regexp = /-\s+(?:Watch\s+)?(.+?)(?:\s+Season\s+([0-9]+))?(?:\s+-)?\s+Episode\s+([0-9]+)/;
-    var data = regexp.exec($('title').text());
-    if (!swf || !data) return done(new Error('Invalid page.'));
+    var regexp = /\s*([^\n\r\t\f]+)\n?\s*[^0-9]*([0-9][0-9.]*)?,?\n?\s\s*[^0-9]*((PV )?[S0-9][P0-9.]*[a-fA-F]?)/;
+    var look = $('#showmedia_about_media').text();
+    var seasonTitle = $('span[itemprop="title"]').text();
+    var data = regexp.exec(look);
+
+    if (!swf || !data)
+    {
+      console.info('Something wrong in the page at '+address+' (data are: '+look+')');
+      console.info('Setting Season to 0 and episode to \’0\’...');
+      done(null, {
+          id: id,
+          episode: "0",
+          series: seasonTitle,
+          swf: swf[1],
+          volume: "0"
+      });
+    }
     done(null, {
       id: id,
-      episode: parseInt(data[3], 10),
+      episode: data[3],
       series: data[1],
       swf: swf[1],
-      volume: parseInt(data[2], 10) || 1
+      volume: data[2] || "1"
     });
   });
 }

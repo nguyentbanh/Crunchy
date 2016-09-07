@@ -57,8 +57,8 @@ function download(cache: {[address: string]: number},
 function filter(config: IConfig, item: ISeriesEpisode) {
   // Filter on chapter.
   var episodeFilter = config.episode;
-  if (episodeFilter > 0 && item.episode <= episodeFilter) return false;
-  if (episodeFilter < 0 && item.episode >= -episodeFilter) return false;
+  if (episodeFilter > 0 && parseInt(item.episode, 10) <= episodeFilter) return false;
+  if (episodeFilter < 0 && parseInt(item.episode, 10) >= -episodeFilter) return false;
 
   // Filter on volume.
   var volumeFilter = config.volume;
@@ -75,18 +75,18 @@ function page(config: IConfig, address: string, done: (err: Error, result?: ISer
     if (err) return done(err);
     var $ = cheerio.load(result);
     var title = $('span[itemprop=name]').text();
-    if (!title) return done(new Error('Invalid page.'));
+    if (!title) return done(new Error('Invalid page.(' + address + ')'));
     var episodes: ISeriesEpisode[] = [];
     $('.episode').each((i, el) => {
       if ($(el).children('img[src*=coming_soon]').length) return;
       var volume = /([0-9]+)\s*$/.exec($(el).closest('ul').prev('a').text());
-      var regexp = /Episode\s+([0-9]+)\s*$/i;
+      var regexp = /Episode\s+((PV )?[S0-9][P0-9.]*[a-fA-F]?)\s*$/i;
       var episode = regexp.exec($(el).children('.series-title').text());
       var address = $(el).attr('href');
       if (!address || !episode) return;
       episodes.push({
         address: address,
-        episode: parseInt(episode[0], 10),
+        episode: episode[1],
         volume: volume ? parseInt(volume[0], 10) : 1
       });
     });
