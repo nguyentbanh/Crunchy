@@ -34,13 +34,39 @@ function complete(message: string, begin: number, done: (err: Error, ign: boolea
 }
 
 /**
+ * Check if a file exist..
+ */
+function fileExist(path: string) {
+  try
+  {
+    fs.statSync(path); 
+    return true; 
+  } 
+  catch (e) { }
+  return false;
+}
+
+/**
  * Downloads the subtitle and video.
  */
 function download(config: IConfig, page: IEpisodePage, player: IEpisodePlayer, done: (err: Error, ign: boolean) => void) {
   var series = config.series || page.series;
   series = series.replace("/","_").replace("'","_");
-  var fileName = name(config, page, series).replace("/","_").replace("'","_");
+  var fileName = name(config, page, series, "").replace("/","_").replace("'","_");
   var filePath = path.join(config.output || process.cwd(), series, fileName);
+  if (fileExist(filePath + ".mkv"))
+  {
+    var count = 0;
+    console.info("File '"+fileName+"' already exist...");
+    do
+    {
+      count = count + 1;
+      fileName = name(config, page, series, "-" + count).replace("/","_").replace("'","_");
+      filePath = path.join(config.output || process.cwd(), series, fileName);
+    } while(fileExist(filePath + ".mkv"))
+    console.info("Renaming to '"+fileName+"'...");
+  }
+
   mkdirp(path.dirname(filePath), (err: Error) => {
     if (err) return done(err, false);
     downloadSubtitle(config, player, filePath, err => {
@@ -105,13 +131,13 @@ function downloadVideo(config: IConfig,
 /**
  * Names the file based on the config, page, series and tag.
  */
-function name(config: IConfig, page: IEpisodePage, series: string) {
+function name(config: IConfig, page: IEpisodePage, series: string, extra: string) {
 	var episodeNum = parseInt(page.episode, 10);
 	var volumeNum = parseInt(page.volume, 10);
   var episode = (episodeNum < 10 ? '0' : '') + page.episode;
   var volume = (volumeNum < 10 ? '0' : '') + page.volume;
   var tag = config.tag || 'CrunchyRoll';
-  return series + ' ' + volume + 'x' + episode + ' [' + tag + ']';  
+  return series + ' ' + volume + 'x' + episode + extra + ' [' + tag + ']';  
 }
 
 /**
