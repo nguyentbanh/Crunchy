@@ -11,11 +11,11 @@ import xml2js = require('xml2js');
 /**
  * Streams the episode to disk.
  */
-export default function(config: IConfig, address: string, done: (err: Error) => void) {
+export default function(config: IConfig, address: string, done: (err: Error, ign: boolean) => void) {
   scrapePage(config, address, (err, page) => {
-    if (err) return done(err);
+    if (err) return done(err, false);
     scrapePlayer(config, address, page.id, (err, player) => {
-      if (err) return done(err);
+      if (err) return done(err, false);
       download(config, page, player, done);
     });
   });
@@ -24,38 +24,46 @@ export default function(config: IConfig, address: string, done: (err: Error) => 
 /**
  * Completes a download and writes the message with an elapsed time.
  */
-function complete(message: string, begin: number, done: (err: Error) => void) {
+function complete(message: string, begin: number, done: (err: Error, ign: boolean) => void) {
   var timeInMs = Date.now() - begin;
   var seconds = prefix(Math.floor(timeInMs / 1000) % 60, 2);
   var minutes = prefix(Math.floor(timeInMs / 1000 / 60) % 60, 2);
   var hours = prefix(Math.floor(timeInMs / 1000 / 60 / 60), 2);
   console.log(message + ' (' + hours + ':' + minutes + ':' + seconds + ')');
-  done(null);
+  done(null, false);
 }
 
 /**
  * Downloads the subtitle and video.
  */
-function download(config: IConfig, page: IEpisodePage, player: IEpisodePlayer, done: (err: Error) => void) {
+function download(config: IConfig, page: IEpisodePage, player: IEpisodePlayer, done: (err: Error, ign: boolean) => void) {
   var series = config.series || page.series;
   series = series.replace("/","_").replace("'","_");
   var fileName = name(config, page, series).replace("/","_").replace("'","_");
   var filePath = path.join(config.output || process.cwd(), series, fileName);
   mkdirp(path.dirname(filePath), (err: Error) => {
-    if (err) return done(err);
+    if (err) return done(err, false);
     downloadSubtitle(config, player, filePath, err => {
-      if (err) return done(err);
+      if (err) return done(err, false);
       var now = Date.now();
-      console.log('Fetching ' + fileName);
-      downloadVideo(config, page, player, filePath, err => {
-        if (err) return done(err);
-        if (config.merge) return complete('Finished ' + fileName, now, done);
-        var isSubtited = Boolean(player.subtitle);
-        video.merge(config, isSubtited, player.video.file, filePath, player.video.mode, err => {
-          if (err) return done(err);
-          complete('Finished ' + fileName, now, done);
+			if (player.video.file != undefined)
+			{
+        console.log('Fetching ' + fileName);
+        downloadVideo(config, page, player, filePath, err => {
+          if (err) return done(err, false);
+          if (config.merge) return complete('Finished ' + fileName, now, done);
+          var isSubtited = Boolean(player.subtitle);
+          video.merge(config, isSubtited, player.video.file, filePath, player.video.mode, err => {
+            if (err) return done(err, false);
+            complete('Finished ' + fileName, now, done);
+          });
         });
-      });
+      }
+      else
+      {
+        console.log('Ignoring ' + fileName + ': not released yet');
+        done(null, true);
+      }
     });
   });
 }

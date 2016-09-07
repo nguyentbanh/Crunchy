@@ -19,14 +19,22 @@ export default function(config: IConfig, address: string, done: (err: Error) => 
       var i = 0;
       (function next() {
         if (i >= page.episodes.length) return done(null);
-        download(cache, config, address, page.episodes[i], err => {
+        download(cache, config, address, page.episodes[i], (err, ignored) => {
           if (err) return done(err);
-          var newCache = JSON.stringify(cache, null, '  ');
-          fs.writeFile(persistentPath, newCache, err => {
-            if (err) return done(err);
+          if ((ignored == false) || (ignored == undefined))
+          {
+            var newCache = JSON.stringify(cache, null, '  ');
+            fs.writeFile(persistentPath, newCache, err => {
+              if (err) return done(err);
+              i += 1;
+              next();
+            });
+          }
+          else
+          {
             i += 1;
             next();
-          });
+          }
         });
       })();
     });
@@ -40,14 +48,14 @@ function download(cache: {[address: string]: number},
   config: IConfig,
   baseAddress: string,
   item: ISeriesEpisode,
-  done: (err: Error) => void) {
-  if (!filter(config, item)) return done(null);
+  done: (err: Error, ign: boolean) => void) {
+  if (!filter(config, item)) return done(null, false);
   var address = url.resolve(baseAddress, item.address);
-  if (cache[address]) return done(null);
-  episode(config, address, err => {
-    if (err) return done(err);
+  if (cache[address]) return done(null, false);
+  episode(config, address, (err, ignored) => {
+    if (err) return done(err, false);
     cache[address] = Date.now();
-    done(null);
+    done(null, ignored);
   });
 }
 
