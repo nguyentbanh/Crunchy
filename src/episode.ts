@@ -137,7 +137,7 @@ function name(config: IConfig, page: IEpisodePage, series: string, extra: string
   var episode = (episodeNum < 10 ? '0' : '') + page.episode;
   var volume = (volumeNum < 10 ? '0' : '') + page.volume;
   var tag = config.tag || 'CrunchyRoll';
-  return series + ' ' + volume + 'x' + episode + extra + ' [' + tag + ']';  
+  return series + ' - s' + volume + 'e' + episode +' - [' + tag + ']' + extra;  
 }
 
 /**
