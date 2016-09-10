@@ -51,8 +51,8 @@ function fileExist(path: string) {
  */
 function download(config: IConfig, page: IEpisodePage, player: IEpisodePlayer, done: (err: Error, ign: boolean) => void) {
   var series = config.series || page.series;
-  series = series.replace("/","_").replace("'","_");
-  var fileName = name(config, page, series, "").replace("/","_").replace("'","_");
+  series = series.replace("/","_").replace("'","_").replace(":","_");
+  var fileName = name(config, page, series, "").replace("/","_").replace("'","_").replace(":","_");
   var filePath = path.join(config.output || process.cwd(), series, fileName);
   if (fileExist(filePath + ".mkv"))
   {
@@ -61,7 +61,7 @@ function download(config: IConfig, page: IEpisodePage, player: IEpisodePlayer, d
     do
     {
       count = count + 1;
-      fileName = name(config, page, series, "-" + count).replace("/","_").replace("'","_");
+      fileName = name(config, page, series, "-" + count).replace("/","_").replace("'","_").replace(":","_");
       filePath = path.join(config.output || process.cwd(), series, fileName);
     } while(fileExist(filePath + ".mkv"))
     console.info("Renaming to '"+fileName+"'...");
