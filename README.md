@@ -1,4 +1,4 @@
-# Crunchy.js: a fork of Deathspike/CrunchyRoll.js
+# Crunchy: a fork of Deathspike/CrunchyRoll.js
 
 *Crunchy.js* is capable of downloading *anime* episodes from the popular *CrunchyRoll* streaming service. An episode is stored in the original video format (often H.264 in a MP4 container) and the configured subtitle format (ASS or SRT).The two output files are then merged into a single MKV file.
 
@@ -10,7 +10,7 @@
 
 This application is not endorsed or affliated with *CrunchyRoll*. The usage of this application enables episodes to be downloaded for offline convenience which may be forbidden by law in your country. Usage of this application may also cause a violation of the agreed *Terms of Service* between you and the stream provider. A tool is not responsible for your actions; please make an informed decision prior to using this application.
 
-**PLEASE USE THIS TOOL ONLY IF YOU HAVE A PREMIUM ACCOUNT**
+**PLEASE _ONLY_ USE THIS TOOL IF YOU HAVE A _PREMIUM ACCOUNT_**
 
 ## Configuration
 
