@@ -11,11 +11,11 @@ import xml2js = require('xml2js');
 /**
  * Streams the episode to disk.
  */
-export default function(config: IConfig, address: string, done: (err: Error) => void) {
+export default function(config: IConfig, address: string, done: (err: Error, ign: boolean) => void) {
   scrapePage(config, address, (err, page) => {
-    if (err) return done(err);
+    if (err) return done(err, false);
     scrapePlayer(config, address, page.id, (err, player) => {
-      if (err) return done(err);
+      if (err) return done(err, false);
       download(config, page, player, done);
     });
   });
@@ -24,37 +24,72 @@ export default function(config: IConfig, address: string, done: (err: Error) => 
 /**
  * Completes a download and writes the message with an elapsed time.
  */
-function complete(message: string, begin: number, done: (err: Error) => void) {
+function complete(message: string, begin: number, done: (err: Error, ign: boolean) => void) {
   var timeInMs = Date.now() - begin;
   var seconds = prefix(Math.floor(timeInMs / 1000) % 60, 2);
   var minutes = prefix(Math.floor(timeInMs / 1000 / 60) % 60, 2);
   var hours = prefix(Math.floor(timeInMs / 1000 / 60 / 60), 2);
   console.log(message + ' (' + hours + ':' + minutes + ':' + seconds + ')');
-  done(null);
+  done(null, false);
+}
+
+/**
+ * Check if a file exist..
+ */
+function fileExist(path: string) {
+  try
+  {
+    fs.statSync(path); 
+    return true; 
+  } 
+  catch (e) { }
+  return false;
 }
 
 /**
  * Downloads the subtitle and video.
  */
-function download(config: IConfig, page: IEpisodePage, player: IEpisodePlayer, done: (err: Error) => void) {
+function download(config: IConfig, page: IEpisodePage, player: IEpisodePlayer, done: (err: Error, ign: boolean) => void) {
   var series = config.series || page.series;
-  var fileName = name(config, page, series);
+  series = series.replace("/","_").replace("'","_").replace(":","_");
+  var fileName = name(config, page, series, "").replace("/","_").replace("'","_").replace(":","_");
   var filePath = path.join(config.output || process.cwd(), series, fileName);
+  if (fileExist(filePath + ".mkv"))
+  {
+    var count = 0;
+    console.info("File '"+fileName+"' already exist...");
+    do
+    {
+      count = count + 1;
+      fileName = name(config, page, series, "-" + count).replace("/","_").replace("'","_").replace(":","_");
+      filePath = path.join(config.output || process.cwd(), series, fileName);
+    } while(fileExist(filePath + ".mkv"))
+    console.info("Renaming to '"+fileName+"'...");
+  }
+
   mkdirp(path.dirname(filePath), (err: Error) => {
-    if (err) return done(err);
+    if (err) return done(err, false);
     downloadSubtitle(config, player, filePath, err => {
-      if (err) return done(err);
+      if (err) return done(err, false);
       var now = Date.now();
-      console.log('Fetching ' + fileName);
-      downloadVideo(config, page, player, filePath, err => {
-        if (err) return done(err);
-        if (config.merge) return complete('Finished ' + fileName, now, done);
-        var isSubtited = Boolean(player.subtitle);
-        video.merge(config, isSubtited, player.video.file, filePath, err => {
-          if (err) return done(err);
-          complete('Finished ' + fileName, now, done);
+			if (player.video.file != undefined)
+			{
+        console.log('Fetching ' + fileName);
+        downloadVideo(config, page, player, filePath, err => {
+          if (err) return done(err, false);
+          if (config.merge) return complete('Finished ' + fileName, now, done);
+          var isSubtited = Boolean(player.subtitle);
+          video.merge(config, isSubtited, player.video.file, filePath, player.video.mode, err => {
+            if (err) return done(err, false);
+            complete('Finished ' + fileName, now, done);
+          });
         });
-      });
+      }
+      else
+      {
+        console.log('Ignoring ' + fileName + ': not released yet');
+        done(null, true);
+      }
     });
   });
 }
@@ -88,18 +123,21 @@ function downloadVideo(config: IConfig,
     player.video.host,
     player.video.file,
     page.swf,
-    filePath + path.extname(player.video.file),
+    filePath, path.extname(player.video.file),
+    player.video.mode,
     done);
 }
 
 /**
  * Names the file based on the config, page, series and tag.
  */
-function name(config: IConfig, page: IEpisodePage, series: string) {
-  var episode = (page.episode < 10 ? '0' : '') + page.episode;
-  var volume = (page.volume < 10 ? '0' : '') + page.volume;
+function name(config: IConfig, page: IEpisodePage, series: string, extra: string) {
+	var episodeNum = parseInt(page.episode, 10);
+	var volumeNum = parseInt(page.volume, 10);
+  var episode = (episodeNum < 10 ? '0' : '') + page.episode;
+  var volume = (volumeNum < 10 ? '0' : '') + page.volume;
   var tag = config.tag || 'CrunchyRoll';
-  return series + ' ' + volume + 'x' + episode + ' [' + tag + ']';
+  return series + ' - s' + volume + 'e' + episode +' - [' + tag + ']' + extra;  
 }
 
 /**
@@ -121,15 +159,29 @@ function scrapePage(config: IConfig, address: string, done: (err: Error, page?: 
     if (err) return done(err);
     var $ = cheerio.load(result);
     var swf = /^([^?]+)/.exec($('link[rel=video_src]').attr('href'));
-    var regexp = /-\s+(?:Watch\s+)?(.+?)(?:\s+Season\s+([0-9]+))?(?:\s+-)?\s+Episode\s+([0-9]+)/;
-    var data = regexp.exec($('title').text());
-    if (!swf || !data) return done(new Error('Invalid page.'));
+    var regexp = /\s*([^\n\r\t\f]+)\n?\s*[^0-9]*([0-9][0-9.]*)?,?\n?\s\s*[^0-9]*((PV )?[S0-9][P0-9.]*[a-fA-F]?)/;
+    var look = $('#showmedia_about_media').text();
+    var seasonTitle = $('span[itemprop="title"]').text();
+    var data = regexp.exec(look);
+
+    if (!swf || !data)
+    {
+      console.info('Something wrong in the page at '+address+' (data are: '+look+')');
+      console.info('Setting Season to 0 and episode to \’0\’...');
+      done(null, {
+          id: id,
+          episode: "0",
+          series: seasonTitle,
+          swf: swf[1],
+          volume: "0"
+      });
+    }
     done(null, {
       id: id,
-      episode: parseInt(data[3], 10),
+      episode: data[3],
       series: data[1],
       swf: swf[1],
-      volume: parseInt(data[2], 10) || 1
+      volume: data[2] || "1"
     });
   });
 }
@@ -152,6 +204,11 @@ function scrapePlayer(config: IConfig, address: string, id: number, done: (err: 
       if (err) return done(err);
       try {
         var isSubtitled = Boolean(player['default:preload'].subtitle);
+		var streamMode="RTMP";
+		if (player['default:preload'].stream_info.host == "")
+		{
+			streamMode="HLS";
+		}
         done(null, {
           subtitle: isSubtitled ? {
             id: parseInt(player['default:preload'].subtitle.$.id, 10),
@@ -159,6 +216,7 @@ function scrapePlayer(config: IConfig, address: string, id: number, done: (err: 
             data: player['default:preload'].subtitle.data
           } : null,
           video: {
+            mode: streamMode,
             file: player['default:preload'].stream_info.file,
             host: player['default:preload'].stream_info.host
           }

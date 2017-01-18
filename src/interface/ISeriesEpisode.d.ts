@@ -1,5 +1,5 @@
 interface ISeriesEpisode {
   address: string;
-  episode: number;
+  episode: string;
   volume: number;
 }
