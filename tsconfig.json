@@ -18,6 +18,7 @@
         "src/cli.ts",
         "src/episode.ts",
         "src/index.ts",
+        "src/log.ts",
         "src/interface/IConfig.d.ts",
         "src/interface/IConfigLine.d.ts",
         "src/interface/IConfigTask.d.ts",

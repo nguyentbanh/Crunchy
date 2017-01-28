@@ -1,6 +1,7 @@
 'use strict';
 import request = require('request');
 import cheerio = require('cheerio');
+import log  = require('./log');
 
 var isAuthenticated = false;
 var isPremium = false;
@@ -80,8 +81,8 @@ function authenticate(config: IConfig, done: (err: Error) => void) {
         var error = $('ul.message, li.error').text();
         return done(new Error('Authentication failed: ' + error));
       }
-      if (isPremium === false) { console.log('Do not use this app without a premium account.'); }
-      else { console.log('You have a premium account! Good!'); }
+      if (isPremium === false) { log.warn('Do not use this app without a premium account.'); }
+      else { log.info('You have a premium account! Good!'); }
       done(null);
     });
   });

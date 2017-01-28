@@ -2,6 +2,7 @@
 import childProcess = require('child_process');
 import path = require('path');
 import os = require('os');
+import log  = require('../log');
 
 /**
  * Streams the video to disk.
@@ -19,7 +20,7 @@ import os = require('os');
  	}
  	else if (mode == "HLS")
  	{
- 		console.info("Experimental FFMPEG, MAY FAIL!!!");
+ 		log.debug("Experimental FFMPEG, MAY FAIL!!!");
  		var cmd=command("ffmpeg") + ' ' + 
  			'-i "' + rtmpInputPath + '" ' + 
  			'-c copy -bsf:a aac_adtstoasc ' + 
@@ -30,7 +31,7 @@ import os = require('os');
  	}
  	else
  	{
- 		console.error("No such mode: " + mode);
+ 		log.error("No such mode: " + mode);
  	}
 }
 

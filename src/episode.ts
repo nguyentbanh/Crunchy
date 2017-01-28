@@ -7,6 +7,7 @@ import path = require('path');
 import subtitle from './subtitle/index';
 import video from './video/index';
 import xml2js = require('xml2js');
+import log  = require('./log');
 
 /**
  * Streams the episode to disk.
@@ -24,12 +25,12 @@ export default function(config: IConfig, address: string, done: (err: Error, ign
 /**
  * Completes a download and writes the message with an elapsed time.
  */
-function complete(message: string, begin: number, done: (err: Error, ign: boolean) => void) {
+function complete(epName: string, message: string, begin: number, done: (err: Error, ign: boolean) => void) {
   var timeInMs = Date.now() - begin;
   var seconds = prefix(Math.floor(timeInMs / 1000) % 60, 2);
   var minutes = prefix(Math.floor(timeInMs / 1000 / 60) % 60, 2);
   var hours = prefix(Math.floor(timeInMs / 1000 / 60 / 60), 2);
-  console.log(message + ' (' + hours + ':' + minutes + ':' + seconds + ')');
+  log.dispEpisode(epName, message + ' (' + hours + ':' + minutes + ':' + seconds + ')', true);
   done(null, false);
 }
 
@@ -57,14 +58,14 @@ function download(config: IConfig, page: IEpisodePage, player: IEpisodePlayer, d
   if (fileExist(filePath + ".mkv"))
   {
     var count = 0;
-    console.info("File '"+fileName+"' already exist...");
+    log.warn("File '"+fileName+"' already exist...");
     do
     {
       count = count + 1;
       fileName = name(config, page, series, "-" + count).replace("/","_").replace("'","_").replace(":","_");
       filePath = path.join(config.output || process.cwd(), series, fileName);
     } while(fileExist(filePath + ".mkv"))
-    console.info("Renaming to '"+fileName+"'...");
+   log.warn("Renaming to '"+fileName+"'...");
   }
 
   mkdirp(path.dirname(filePath), (err: Error) => {
@@ -74,20 +75,20 @@ function download(config: IConfig, page: IEpisodePage, player: IEpisodePlayer, d
       var now = Date.now();
 			if (player.video.file != undefined)
 			{
-        console.log('Fetching ' + fileName);
+        log.dispEpisode(fileName, 'Fetching...', false);
         downloadVideo(config, page, player, filePath, err => {
           if (err) return done(err, false);
-          if (config.merge) return complete('Finished ' + fileName, now, done);
+          if (config.merge) return complete(fileName, 'Finished!', now, done);
           var isSubtited = Boolean(player.subtitle);
           video.merge(config, isSubtited, player.video.file, filePath, player.video.mode, err => {
             if (err) return done(err, false);
-            complete('Finished ' + fileName, now, done);
+            complete(fileName, 'Finished!', now, done);
           });
         });
       }
       else
       {
-        console.log('Ignoring ' + fileName + ': not released yet');
+        log.dispEpisode(fileName, 'Ignoring: not released yet', true);
         done(null, true);
       }
     });
@@ -166,8 +167,8 @@ function scrapePage(config: IConfig, address: string, done: (err: Error, page?: 
 
     if (!swf || !data)
     {
-      console.info('Something wrong in the page at '+address+' (data are: '+look+')');
-      console.info('Setting Season to 0 and episode to \’0\’...');
+      log.warn('Something wrong in the page at '+address+' (data are: '+look+')');
+      log.warn('Setting Season to 0 and episode to \’0\’...');
       done(null, {
           id: id,
           episode: "0",

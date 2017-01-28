@@ -5,6 +5,7 @@ import fs = require('fs');
 import request = require('./request');
 import path = require('path');
 import url = require('url');
+import log  = require('./log');
 var persistent = '.crpersistent';
 
 /**
@@ -84,6 +85,7 @@ function page(config: IConfig, address: string, done: (err: Error, result?: ISer
     var $ = cheerio.load(result);
     var title = $('span[itemprop=name]').text();
     if (!title) return done(new Error('Invalid page.(' + address + ')'));
+    log.info("Checking availability for " + title);
     var episodes: ISeriesEpisode[] = [];
     $('.episode').each((i, el) => {
       if ($(el).children('img[src*=coming_soon]').length) return;
