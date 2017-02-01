@@ -20,7 +20,7 @@ import log  = require('../log');
  	}
  	else if (mode == "HLS")
  	{
- 		log.debug("Experimental FFMPEG, MAY FAIL!!!");
+ 		//log.debug("Experimental FFMPEG, MAY FAIL!!!");
  		var cmd=command("ffmpeg") + ' ' + 
  			'-i "' + rtmpInputPath + '" ' + 
  			'-c copy -bsf:a aac_adtstoasc ' + 
