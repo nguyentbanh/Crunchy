@@ -19,19 +19,20 @@
   "dependencies": {
     "big-integer": "1.4.4",
     "cheerio": "0.22.0",
+    "cloudscraper": "1.4.1",
     "commander": "2.6.0",
     "mkdirp": "0.5.0",
     "request": "2.74.0",
     "xml2js": "0.4.5"
   },
   "devDependencies": {
-    "tsd": "0.5.7",
+    "typing": "2.1.0",
     "tslint": "2.3.0-beta",
     "typescript": "1.5.0-beta"
   },
   "scripts": {
-    "prepublish": "npm run tsd && tsc",
+    "prepublish": "npm run types && tsc",
     "test": "node ts --only-test",
-    "tsd": "tsd reinstall -o -s"
+    "types": "typings install"
   }
 }
