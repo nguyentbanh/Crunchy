@@ -19,30 +19,34 @@ export default function(config: IConfig, address: string, done: (err: Error) => 
   {
     const cache = config.cache ? {} : JSON.parse(contents || '{}');
 
-    page(config, address, (err, page) =>
+    page(config, address, (errP, page) =>
     {
-      if (err)
+      if (errP)
       {
-        return done(err);
+        return done(errP);
       }
 
       let i = 0;
       (function next()
       {
         if (i >= page.episodes.length) return done(null);
-        download(cache, config, address, page.episodes[i], (err, ignored) =>
+        download(cache, config, address, page.episodes[i], (errD, ignored) =>
         {
-          if (err)
+          if (errD)
           {
-            return done(err);
+            return done(errD);
           }
 
           if ((ignored === false) || (ignored === undefined))
           {
             const newCache = JSON.stringify(cache, null, '  ');
-            fs.writeFile(persistentPath, newCache, err =>
+            fs.writeFile(persistentPath, newCache, (errW) =>
             {
-              if (err) return done(err);
+              if (errW)
+              {
+                return done(errW);
+              }
+
               i += 1;
               next();
             });
@@ -96,15 +100,20 @@ function filter(config: IConfig, item: ISeriesEpisode)
 {
   // Filter on chapter.
   const episodeFilter = config.episode;
-
-  if (episodeFilter > 0 && parseInt(item.episode, 10) <= episodeFilter) return false;
-  if (episodeFilter < 0 && parseInt(item.episode, 10) >= -episodeFilter) return false;
-
   // Filter on volume.
   const volumeFilter = config.volume;
 
-  if (volumeFilter > 0 && item.volume <= volumeFilter) return false;
-  if (volumeFilter < 0 && item.volume >= -volumeFilter) return false;
+  const currentEpisode = parseInt(item.episode, 10);
+  const currentVolume = item.volume;
+
+  if ( ( (episodeFilter > 0) && (currentEpisode <=  episodeFilter) ) ||
+       ( (episodeFilter < 0) && (currentEpisode >= -episodeFilter) ) ||
+       ( (volumeFilter  > 0) && (currentVolume  <=  volumeFilter ) ) ||
+       ( (volumeFilter  < 0) && (currentVolume  >= -volumeFilter ) ) )
+  {
+    return false;
+  }
+
   return true;
 }
 
@@ -113,48 +122,54 @@ function filter(config: IConfig, item: ISeriesEpisode)
  */
 function page(config: IConfig, address: string, done: (err: Error, result?: ISeries) => void)
 {
-  request.get(config, address, (err, result) =>
+  if (address[0] === '@')
   {
-    if (err)
-    {
-      return done(err);
-    }
-
-    const $ = cheerio.load(result);
-    const title = $('span[itemprop=name]').text();
-
-    if (!title)
-    {
-      return done(new Error('Invalid page.(' + address + ')'));
-    }
-
-    log.info('Checking availability for ' + title);
     const episodes: ISeriesEpisode[] = [];
-
-    $('.episode').each((i, el) =>
-    {
-      if ($(el).children('img[src*=coming_soon]').length)
-      {
-        return;
-      }
-
-      const volume = /([0-9]+)\s*$/.exec($(el).closest('ul').prev('a').text());
-      const regexp = /Episode\s+((PV )?[S0-9][P0-9.]*[a-fA-F]?)\s*$/i;
-      const episode = regexp.exec($(el).children('.series-title').text());
-      const address = $(el).attr('href');
-
-      if (!address || !episode)
-      {
-        return;
-      }
-
-      episodes.push({
-        address: address,
-        episode: episode[1],
-        volume: volume ? parseInt(volume[0], 10) : 1
-      });
+    episodes.push({
+      address: address.substr(1),
+      episode: '',
+      volume: 0,
     });
+    done(null, {episodes: episodes.reverse(), series: ""});
+  }
+  else
+  {
+    request.get(config, address, (err, result) => {
+      if (err) {
+        return done(err);
+      }
 
-    done(null, {episodes: episodes.reverse(), series: title});
-  });
+      const $ = cheerio.load(result);
+      const title = $('span[itemprop=name]').text();
+
+      if (!title) {
+        return done(new Error('Invalid page.(' + address + ')'));
+      }
+
+      log.info('Checking availability for ' + title);
+      const episodes: ISeriesEpisode[] = [];
+
+      $('.episode').each((i, el) => {
+        if ($(el).children('img[src*=coming_soon]').length) {
+          return;
+        }
+
+        const volume = /([0-9]+)\s*$/.exec($(el).closest('ul').prev('a').text());
+        const regexp = /Episode\s+((PV )?[S0-9][P0-9.]*[a-fA-F]?)\s*$/i;
+        const episode = regexp.exec($(el).children('.series-title').text());
+        const url = $(el).attr('href');
+
+        if ((!url) || (!episode)) {
+          return;
+        }
+        episodes.push({
+          address: url,
+          episode: episode[1],
+          volume: volume ? parseInt(volume[0], 10) : 1,
+        });
+      });
+
+      done(null, {episodes: episodes.reverse(), series: title});
+    });
+  }
 }

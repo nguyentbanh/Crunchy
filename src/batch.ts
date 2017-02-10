@@ -28,11 +28,11 @@ export default function(args: string[], done: (err?: Error) => void)
         return done();
       }
 
-      series(tasks[i].config, tasks[i].address, err =>
+      series(tasks[i].config, tasks[i].address, (errin) =>
       {
-        if (err)
+        if (errin)
         {
-          return done(err);
+          return done(errin);
         }
         i += 1;
         next();
@@ -48,7 +48,7 @@ function split(value: string): string[]
 {
   let inQuote = false;
   let i: number;
-  let pieces: string[] = [];
+  const pieces: string[] = [];
   let previous = 0;
 
   for (i = 0; i < value.length; i += 1)
@@ -65,7 +65,7 @@ function split(value: string): string[]
     }
   }
 
-  let lastPiece = value.substring(previous, i).match(/^"?(.+?)"?$/);
+  const lastPiece = value.substring(previous, i).match(/^"?(.+?)"?$/);
 
   if (lastPiece)
   {
@@ -82,13 +82,15 @@ function tasks(config: IConfigLine, batchPath: string, done: (err: Error, tasks?
 {
   if (config.args.length)
   {
-    return done(null, config.args.map(address =>
+    const configIn = config;
+
+    return done(null, config.args.map((addressIn) =>
     {
-      return {address: address, config: config};
+      return {address: addressIn, config: configIn};
     }));
   }
 
-  fs.exists(batchPath, exists =>
+  fs.exists(batchPath, (exists) =>
   {
     if (!exists)
     {
@@ -102,25 +104,25 @@ function tasks(config: IConfigLine, batchPath: string, done: (err: Error, tasks?
         return done(err);
       }
 
-      let map: IConfigTask[] = [];
+      const map: IConfigTask[] = [];
 
-      data.split(/\r?\n/).forEach(line =>
+      data.split(/\r?\n/).forEach((line) =>
       {
         if (/^(\/\/|#)/.test(line))
         {
           return;
         }
 
-        let lineConfig = parse(process.argv.concat(split(line)));
+        const lineConfig = parse(process.argv.concat(split(line)));
 
-        lineConfig.args.forEach(address =>
+        lineConfig.args.forEach((addressIn) =>
         {
-          if (!address)
+          if (!addressIn)
           {
             return;
           }
 
-          map.push({address: address, config: lineConfig});
+          map.push({address: addressIn, config: lineConfig});
         });
       });
       done(null, map);
