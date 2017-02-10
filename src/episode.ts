@@ -12,11 +12,22 @@ import log  = require('./log');
 /**
  * Streams the episode to disk.
  */
-export default function(config: IConfig, address: string, done: (err: Error, ign: boolean) => void) {
-  scrapePage(config, address, (err, page) => {
-    if (err) return done(err, false);
-    scrapePlayer(config, address, page.id, (err, player) => {
-      if (err) return done(err, false);
+export default function(config: IConfig, address: string, done: (err: Error, ign: boolean) => void)
+{
+  scrapePage(config, address, (err, page) =>
+  {
+    if (err)
+    {
+      return done(err, false);
+    }
+
+    scrapePlayer(config, address, page.id, (err, player) =>
+    {
+      if (err)
+      {
+        return done(err, false);
+      }
+
       download(config, page, player, done);
     });
   });
@@ -25,63 +36,98 @@ export default function(config: IConfig, address: string, done: (err: Error, ign
 /**
  * Completes a download and writes the message with an elapsed time.
  */
-function complete(epName: string, message: string, begin: number, done: (err: Error, ign: boolean) => void) {
-  var timeInMs = Date.now() - begin;
-  var seconds = prefix(Math.floor(timeInMs / 1000) % 60, 2);
-  var minutes = prefix(Math.floor(timeInMs / 1000 / 60) % 60, 2);
-  var hours = prefix(Math.floor(timeInMs / 1000 / 60 / 60), 2);
+function complete(epName: string, message: string, begin: number, done: (err: Error, ign: boolean) => void)
+{
+  const timeInMs = Date.now() - begin;
+  const seconds = prefix(Math.floor(timeInMs / 1000) % 60, 2);
+  const minutes = prefix(Math.floor(timeInMs / 1000 / 60) % 60, 2);
+  const hours = prefix(Math.floor(timeInMs / 1000 / 60 / 60), 2);
+
   log.dispEpisode(epName, message + ' (' + hours + ':' + minutes + ':' + seconds + ')', true);
+
   done(null, false);
 }
 
 /**
  * Check if a file exist..
  */
-function fileExist(path: string) {
+function fileExist(path: string)
+{
   try
   {
-    fs.statSync(path); 
-    return true; 
-  } 
-  catch (e) { }
-  return false;
+    fs.statSync(path);
+    return true;
+  } catch (e)
+  {
+    return false;
+  }
 }
 
 /**
  * Downloads the subtitle and video.
  */
-function download(config: IConfig, page: IEpisodePage, player: IEpisodePlayer, done: (err: Error, ign: boolean) => void) {
-  var series = config.series || page.series;
-  series = series.replace("/","_").replace("'","_").replace(":","_");
-  var fileName = name(config, page, series, "").replace("/","_").replace("'","_").replace(":","_");
-  var filePath = path.join(config.output || process.cwd(), series, fileName);
-  if (fileExist(filePath + ".mkv"))
+function download(config: IConfig, page: IEpisodePage, player: IEpisodePlayer, done: (err: Error, ign: boolean) => void)
+{
+  let series = config.series || page.series;
+
+  series = series.replace('/', '_').replace('\'', '_').replace(':', '_');
+  let fileName = name(config, page, series, '').replace('/', '_').replace('\'', '_').replace(':', '_');
+  let filePath = path.join(config.output || process.cwd(), series, fileName);
+
+  if (fileExist(filePath + '.mkv'))
   {
-    var count = 0;
-    log.warn("File '"+fileName+"' already exist...");
+    let count = 0;
+    log.warn('File \'' + fileName + '\' already exist...');
+
     do
     {
       count = count + 1;
-      fileName = name(config, page, series, "-" + count).replace("/","_").replace("'","_").replace(":","_");
+      fileName = name(config, page, series, '-' + count).replace('/', '_').replace('\'', '_').replace(':', '_');
       filePath = path.join(config.output || process.cwd(), series, fileName);
-    } while(fileExist(filePath + ".mkv"))
-   log.warn("Renaming to '"+fileName+"'...");
+    } while (fileExist(filePath + '.mkv'));
+
+    log.warn('Renaming to \'' + fileName + '\'...');
   }
 
-  mkdirp(path.dirname(filePath), (err: Error) => {
-    if (err) return done(err, false);
-    downloadSubtitle(config, player, filePath, err => {
-      if (err) return done(err, false);
-      var now = Date.now();
-			if (player.video.file != undefined)
-			{
+  mkdirp(path.dirname(filePath), (err: Error) =>
+  {
+    if (err)
+    {
+      return done(err, false);
+    }
+
+    downloadSubtitle(config, player, filePath, err =>
+    {
+      if (err)
+      {
+        return done(err, false);
+      }
+
+      const now = Date.now();
+      if (player.video.file !== undefined)
+      {
         log.dispEpisode(fileName, 'Fetching...', false);
-        downloadVideo(config, page, player, filePath, err => {
-          if (err) return done(err, false);
-          if (config.merge) return complete(fileName, 'Finished!', now, done);
-          var isSubtited = Boolean(player.subtitle);
-          video.merge(config, isSubtited, player.video.file, filePath, player.video.mode, err => {
-            if (err) return done(err, false);
+        downloadVideo(config, page, player, filePath, err =>
+        {
+          if (err)
+          {
+            return done(err, false);
+          }
+
+          if (config.merge)
+          {
+            return complete(fileName, 'Finished!', now, done);
+          }
+
+          const isSubtited = Boolean(player.subtitle);
+
+          video.merge(config, isSubtited, player.video.file, filePath, player.video.mode, err =>
+          {
+            if (err)
+            {
+              return done(err, false);
+            }
+
             complete(fileName, 'Finished!', now, done);
           });
         });
@@ -98,15 +144,32 @@ function download(config: IConfig, page: IEpisodePage, player: IEpisodePlayer, d
 /**
  * Saves the subtitles to disk.
  */
-function downloadSubtitle(config: IConfig, player: IEpisodePlayer, filePath: string, done: (err?: Error) => void) {
-  var enc = player.subtitle;
-  if (!enc) return done();
-  subtitle.decode(enc.id, enc.iv, enc.data, (err, data) => {
-    if (err) return done(err);
-    var formats = subtitle.formats;
-    var format = formats[config.format] ? config.format : 'ass';
-    formats[format](data, (err: Error, decodedSubtitle: string) => {
-      if (err) return done(err);
+function downloadSubtitle(config: IConfig, player: IEpisodePlayer, filePath: string, done: (err?: Error) => void)
+{
+  const enc = player.subtitle;
+
+  if (!enc)
+  {
+    return done();
+  }
+
+  subtitle.decode(enc.id, enc.iv, enc.data, (err, data) =>
+  {
+    if (err)
+    {
+      return done(err);
+    }
+
+    const formats = subtitle.formats;
+    const format = formats[config.format] ? config.format : 'ass';
+
+    formats[format](data, (err: Error, decodedSubtitle: string) =>
+    {
+      if (err)
+      {
+        return done(err);
+      }
+
       fs.writeFile(filePath + '.' + format, '\ufeff' + decodedSubtitle, done);
     });
   });
@@ -115,66 +178,78 @@ function downloadSubtitle(config: IConfig, player: IEpisodePlayer, filePath: str
 /**
  * Streams the video to disk.
  */
-function downloadVideo(config: IConfig,
-  page: IEpisodePage,
-  player: IEpisodePlayer,
-  filePath: string,
-  done: (err: Error) => void) {
-  video.stream(
-    player.video.host,
-    player.video.file,
-    page.swf,
-    filePath, path.extname(player.video.file),
-    player.video.mode,
-    done);
+function downloadVideo(config: IConfig,  page: IEpisodePage, player: IEpisodePlayer,
+                       filePath: string, done: (err: Error) => void)
+{
+  video.stream(player.video.host,player.video.file, page.swf, filePath, path.extname(player.video.file),
+               player.video.mode, done);
 }
 
 /**
  * Names the file based on the config, page, series and tag.
  */
-function name(config: IConfig, page: IEpisodePage, series: string, extra: string) {
-	var episodeNum = parseInt(page.episode, 10);
-	var volumeNum = parseInt(page.volume, 10);
-  var episode = (episodeNum < 10 ? '0' : '') + page.episode;
-  var volume = (volumeNum < 10 ? '0' : '') + page.volume;
-  var tag = config.tag || 'CrunchyRoll';
-  return series + ' - s' + volume + 'e' + episode +' - [' + tag + ']' + extra;  
+function name(config: IConfig, page: IEpisodePage, series: string, extra: string)
+{
+  const episodeNum = parseInt(page.episode, 10);
+  const volumeNum = parseInt(page.volume, 10);
+  const episode = (episodeNum < 10 ? '0' : '') + page.episode;
+  const volume = (volumeNum < 10 ? '0' : '') + page.volume;
+  const tag = config.tag || 'CrunchyRoll';
+
+  return series + ' - s' + volume + 'e' + episode + ' - [' + tag + ']' + extra;
 }
 
 /**
  * Prefixes a value.
  */
-function prefix(value: number|string, length: number) {
-  var valueString = typeof value !== 'string' ? String(value) : value;
-  while (valueString.length < length) valueString = '0' + valueString;
+function prefix(value: number|string, length: number)
+{
+  let valueString = (typeof value !== 'string') ? String(value) : value;
+
+  while (valueString.length < length)
+  {
+    valueString = '0' + valueString;
+  }
+
   return valueString;
 }
 
 /**
  * Requests the page data and scrapes the id, episode, series and swf.
  */
-function scrapePage(config: IConfig, address: string, done: (err: Error, page?: IEpisodePage) => void) {
-  var id = parseInt((address.match(/[0-9]+$/) || ['0'])[0], 10);
-  if (!id) return done(new Error('Invalid address.'));
-  request.get(config, address, (err, result) => {
-    if (err) return done(err);
-    var $ = cheerio.load(result);
-    var swf = /^([^?]+)/.exec($('link[rel=video_src]').attr('href'));
-    var regexp = /\s*([^\n\r\t\f]+)\n?\s*[^0-9]*([0-9][0-9.]*)?,?\n?\s\s*[^0-9]*((PV )?[S0-9][P0-9.]*[a-fA-F]?)/;
-    var look = $('#showmedia_about_media').text();
-    var seasonTitle = $('span[itemprop="title"]').text();
-    var data = regexp.exec(look);
+function scrapePage(config: IConfig, address: string, done: (err: Error, page?: IEpisodePage) => void)
+{
+  const id = parseInt((address.match(/[0-9]+$/) || ['0'])[0], 10);
+
+  if (!id)
+  {
+    return done(new Error('Invalid address.'));
+  }
+
+  request.get(config, address, (err, result) =>
+  {
+    if (err)
+    {
+      return done(err);
+    }
+
+    const $ = cheerio.load(result);
+    const swf = /^([^?]+)/.exec($('link[rel=video_src]').attr('href'));
+    const regexp = /\s*([^\n\r\t\f]+)\n?\s*[^0-9]*([0-9][0-9.]*)?,?\n?\s\s*[^0-9]*((PV )?[S0-9][P0-9.]*[a-fA-F]?)/;
+    const look = $('#showmedia_about_media').text();
+    const seasonTitle = $('span[itemprop="title"]').text();
+    const data = regexp.exec(look);
 
     if (!swf || !data)
     {
-      log.warn('Something wrong in the page at '+address+' (data are: '+look+')');
-      log.warn('Setting Season to 0 and episode to \’0\’...');
+      log.warn('Something wrong in the page at ' + address + ' (data are: ' + look + ')');
+      log.warn('Setting Season to 0 and episode to ’0’...');
       done(null, {
           id: id,
-          episode: "0",
+          episode: '0',
           series: seasonTitle,
           swf: swf[1],
-          volume: "0"
+          volume: '0'
       });
     }
     done(null, {
@@ -182,7 +257,7 @@ function scrapePage(config: IConfig, address: string, done: (err: Error, page?: 
       episode: data[3],
       series: data[1],
       swf: swf[1],
-      volume: data[2] || "1"
+      volume: data[2] || '1'
     });
   });
 }
@@ -190,26 +265,45 @@ function scrapePage(config: IConfig, address: string, done: (err: Error, page?: 
 /**
  * Requests the player data and scrapes the subtitle and video data.
  */
-function scrapePlayer(config: IConfig, address: string, id: number, done: (err: Error, player?: IEpisodePlayer) => void) {
-  var url = address.match(/^(https?:\/\/[^\/]+)/);
-  if (!url) return done(new Error('Invalid address.'));
+function scrapePlayer(config: IConfig, address: string, id: number, done: (err: Error, player?: IEpisodePlayer) => void)
+{
+  const url = address.match(/^(https?:\/\/[^\/]+)/);
+
+  if (!url)
+  {
+    return done(new Error('Invalid address.'));
+  }
+
   request.post(config, {
     form: {current_page: address},
     url: url[1] + '/xml/?req=RpcApiVideoPlayer_GetStandardConfig&media_id=' + id
-  }, (err, result) => {
-    if (err) return done(err);
+  }, (err, result) =>
+  {
+    if (err)
+    {
+      return done(err);
+    }
+
     xml2js.parseString(result, {
       explicitArray: false,
       explicitRoot: false
-    }, (err: Error, player: IEpisodePlayerConfig) => {
-      if (err) return done(err);
-      try {
-        var isSubtitled = Boolean(player['default:preload'].subtitle);
-		var streamMode="RTMP";
-		if (player['default:preload'].stream_info.host == "")
+    }, (err: Error, player: IEpisodePlayerConfig) =>
+    {
+      if (err)
+      {
+        return done(err);
+      }
+
+      try
+      {
+        const isSubtitled = Boolean(player['default:preload'].subtitle);
+		let streamMode = 'RTMP';
+
+		if (player['default:preload'].stream_info.host === '')
 		{
-			streamMode="HLS";
+			streamMode = 'HLS';
 		}
+
         done(null, {
           subtitle: isSubtitled ? {
             id: parseInt(player['default:preload'].subtitle.$.id, 10),
@@ -222,7 +316,8 @@ function scrapePlayer(config: IConfig, address: string, id: number, done: (err: 
             host: player['default:preload'].stream_info.host
           }
         });
-      } catch (parseError) {
+      } catch (parseError)
+      {
         done(parseError);
       }
     });

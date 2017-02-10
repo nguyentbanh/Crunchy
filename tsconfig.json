@@ -41,13 +41,6 @@
         "src/video/index.ts",
         "src/video/merge.ts",
         "src/video/stream.ts",
-        "typings/big-integer/big-integer.d.ts",
-        "typings/cheerio/cheerio.d.ts",
-        "typings/commander/commander.d.ts",
-        "typings/form-data/form-data.d.ts",
-        "typings/mkdirp/mkdirp.d.ts",
-        "typings/node/node.d.ts",
-        "typings/request/request.d.ts",
-        "typings/xml2js/xml2js.d.ts"
+        "typings/index.d.ts"
     ]
 }

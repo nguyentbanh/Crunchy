@@ -7,16 +7,33 @@ import series from './series';
 /**
  * Streams the batch of series to disk.
  */
-export default function(args: string[], done: (err?: Error) => void) {
-  var config = parse(args);
-  var batchPath = path.join(config.output || process.cwd(), 'CrunchyRoll.txt');
-  tasks(config, batchPath, (err, tasks) => {
-    if (err) return done(err);
-    var i = 0;
-    (function next() {
-      if (i >= tasks.length) return done();
-      series(tasks[i].config, tasks[i].address, err => {
-        if (err) return done(err);
+export default function(args: string[], done: (err?: Error) => void)
+{
+  const config = parse(args);
+  const batchPath = path.join(config.output || process.cwd(), 'CrunchyRoll.txt');
+
+  tasks(config, batchPath, (err, tasks) =>
+  {
+    if (err)
+    {
+      return done(err);
+    }
+
+    let i = 0;
+
+    (function next()
+    {
+      if (i >= tasks.length)
+      {
+        return done();
+      }
+
+      series(tasks[i].config, tasks[i].address, err =>
+      {
+        if (err)
+        {
+          return done(err);
+        }
         i += 1;
         next();
       });
@@ -27,42 +44,82 @@ export default function(args: string[], done: (err?: Error) => void) {
 /**
  * Splits the value into arguments.
  */
-function split(value: string): string[] {
-  var inQuote = false;
-  var i: number;
-  var pieces: string[] = [];
-  var previous = 0;
-  for (i = 0; i < value.length; i += 1) {
-    if (value.charAt(i) === '"') inQuote = !inQuote;
-    if (!inQuote && value.charAt(i) === ' ') {
+function split(value: string): string[]
+{
+  let inQuote = false;
+  let i: number;
+  let pieces: string[] = [];
+  let previous = 0;
+
+  for (i = 0; i < value.length; i += 1)
+  {
+    if (value.charAt(i) === '"')
+    {
+      inQuote = !inQuote;
+    }
+
+    if (!inQuote && value.charAt(i) === ' ')
+    {
       pieces.push(value.substring(previous, i).match(/^"?(.+?)"?$/)[1]);
       previous = i + 1;
     }
   }
-  var lastPiece = value.substring(previous, i).match(/^"?(.+?)"?$/);
-  if (lastPiece) pieces.push(lastPiece[1]);
+
+  let lastPiece = value.substring(previous, i).match(/^"?(.+?)"?$/);
+
+  if (lastPiece)
+  {
+    pieces.push(lastPiece[1]);
+  }
+
   return pieces;
 }
 
 /**
  * Parses the configuration or reads the batch-mode file for tasks.
  */
-function tasks(config: IConfigLine, batchPath: string, done: (err: Error, tasks?: IConfigTask[]) => void) {
-  if (config.args.length) {
-    return done(null, config.args.map(address => {
+function tasks(config: IConfigLine, batchPath: string, done: (err: Error, tasks?: IConfigTask[]) => void)
+{
+  if (config.args.length)
+  {
+    return done(null, config.args.map(address =>
+    {
       return {address: address, config: config};
     }));
   }
-  fs.exists(batchPath, exists => {
-    if (!exists) return done(null, []);
-    fs.readFile(batchPath, 'utf8', (err, data) => {
-      if (err) return done(err);
-      var map: IConfigTask[] = [];
-      data.split(/\r?\n/).forEach(line => {
-        if (/^(\/\/|#)/.test(line)) return;
-        var lineConfig = parse(process.argv.concat(split(line)));
-        lineConfig.args.forEach(address => {
-          if (!address) return;
+
+  fs.exists(batchPath, exists =>
+  {
+    if (!exists)
+    {
+      return done(null, []);
+    }
+
+    fs.readFile(batchPath, 'utf8', (err, data) =>
+    {
+      if (err)
+      {
+        return done(err);
+      }
+
+      let map: IConfigTask[] = [];
+
+      data.split(/\r?\n/).forEach(line =>
+      {
+        if (/^(\/\/|#)/.test(line))
+        {
+          return;
+        }
+
+        let lineConfig = parse(process.argv.concat(split(line)));
+
+        lineConfig.args.forEach(address =>
+        {
+          if (!address)
+          {
+            return;
+          }
+
           map.push({address: address, config: lineConfig});
         });
       });
@@ -74,7 +131,8 @@ function tasks(config: IConfigLine, batchPath: string, done: (err: Error, tasks?
 /**
  * Parses the arguments and returns a configuration.
  */
-function parse(args: string[]): IConfigLine {
+function parse(args: string[]): IConfigLine
+{
   return new commander.Command().version(require('../package').version)
     // Authentication
     .option('-p, --pass <s>', 'The password.')

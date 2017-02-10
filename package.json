@@ -17,22 +17,29 @@
     "crunchy": "./bin/crunchy"
   },
   "dependencies": {
-    "big-integer": "1.4.4",
-    "cheerio": "0.22.0",
-    "cloudscraper": "1.4.1",
-    "commander": "2.6.0",
-    "mkdirp": "0.5.0",
-    "request": "2.74.0",
-    "xml2js": "0.4.5"
+    "big-integer": "^1.4.4",
+    "cheerio": "^0.22.0",
+    "cloudscraper": "^1.4.1",
+    "commander": "^2.6.0",
+    "mkdirp": "^0.5.0",
+    "request": "^2.74.0",
+    "xml2js": "^0.4.5"
   },
   "devDependencies": {
-    "typings": "2.1.0",
-    "tslint": "2.3.0-beta",
-    "typescript": "1.5.0-beta"
+    "tsconfig-lint": "^0.12.0",
+    "tslint": "^4.4.2",
+    "typescript": "^2.2.0",
+    "typings": "^2.1.0"
   },
   "scripts": {
     "prepublish": "npm run types && tsc",
-    "test": "node ts --only-test",
-    "types": "typings install"
+    "compile": "tsc",
+    "test": "tslint -c ./tslint.json --project ./tsconfig.json ./src/**/*.ts",
+    "types": "typings install",
+    "reinstall": "tsd reinstall; npm run types",
+    "start": "node ./bin/crunchy"
+  },
+  "bugs": {
+    "url": "https://github.com/Godzil/Crunchy/issues"
   }
 }
