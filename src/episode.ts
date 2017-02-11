@@ -21,11 +21,11 @@ export default function(config: IConfig, address: string, done: (err: Error, ign
       return done(err, false);
     }
 
-    scrapePlayer(config, address, page.id, (err, player) =>
+    scrapePlayer(config, address, page.id, (errS, player) =>
     {
-      if (err)
+      if (errS)
       {
-        return done(err, false);
+        return done(errS, false);
       }
 
       download(config, page, player, done);
@@ -89,29 +89,29 @@ function download(config: IConfig, page: IEpisodePage, player: IEpisodePlayer, d
     log.warn('Renaming to \'' + fileName + '\'...');
   }
 
-  mkdirp(path.dirname(filePath), (err: Error) =>
+  mkdirp(path.dirname(filePath), (errM: Error) =>
   {
-    if (err)
+    if (errM)
     {
-      return done(err, false);
+      return done(errM, false);
     }
 
-    downloadSubtitle(config, player, filePath, err =>
+    downloadSubtitle(config, player, filePath, (errDS) =>
     {
-      if (err)
+      if (errDS)
       {
-        return done(err, false);
+        return done(errDS, false);
       }
 
       const now = Date.now();
       if (player.video.file !== undefined)
       {
         log.dispEpisode(fileName, 'Fetching...', false);
-        downloadVideo(config, page, player, filePath, err =>
+        downloadVideo(config, page, player, filePath, (errDV) =>
         {
-          if (err)
+          if (errDV)
           {
-            return done(err, false);
+            return done(errDV, false);
           }
 
           if (config.merge)
@@ -121,11 +121,11 @@ function download(config: IConfig, page: IEpisodePage, player: IEpisodePlayer, d
 
           const isSubtited = Boolean(player.subtitle);
 
-          video.merge(config, isSubtited, player.video.file, filePath, player.video.mode, err =>
+          video.merge(config, isSubtited, player.video.file, filePath, player.video.mode, (errVM) =>
           {
-            if (err)
+            if (errVM)
             {
-              return done(err, false);
+              return done(errVM, false);
             }
 
             complete(fileName, 'Finished!', now, done);
@@ -153,21 +153,21 @@ function downloadSubtitle(config: IConfig, player: IEpisodePlayer, filePath: str
     return done();
   }
 
-  subtitle.decode(enc.id, enc.iv, enc.data, (err, data) =>
+  subtitle.decode(enc.id, enc.iv, enc.data, (errSD, data) =>
   {
-    if (err)
+    if (errSD)
     {
-      return done(err);
+      return done(errSD);
     }
 
     const formats = subtitle.formats;
     const format = formats[config.format] ? config.format : 'ass';
 
-    formats[format](data, (err: Error, decodedSubtitle: string) =>
+    formats[format](data, (errF: Error, decodedSubtitle: string) =>
     {
-      if (err)
+      if (errF)
       {
-        return done(err);
+        return done(errF);
       }
 
       fs.writeFile(filePath + '.' + format, '\ufeff' + decodedSubtitle, done);
@@ -178,11 +178,11 @@ function downloadSubtitle(config: IConfig, player: IEpisodePlayer, filePath: str
 /**
  * Streams the video to disk.
  */
-function downloadVideo(config: IConfig,  page: IEpisodePage, player: IEpisodePlayer,
+function downloadVideo(ignored/*config*/: IConfig,  page: IEpisodePage, player: IEpisodePlayer,
                        filePath: string, done: (err: Error) => void)
 {
-  video.stream(player.video.host,player.video.file, page.swf, filePath, path.extname(player.video.file),
-               player.video.mode, done);
+  video.stream(player.video.host, player.video.file, page.swf, filePath,
+               path.extname(player.video.file), player.video.mode, done);
 }
 
 /**
@@ -219,9 +219,9 @@ function prefix(value: number|string, length: number)
  */
 function scrapePage(config: IConfig, address: string, done: (err: Error, page?: IEpisodePage) => void)
 {
-  const id = parseInt((address.match(/[0-9]+$/) || ['0'])[0], 10);
+  const epId = parseInt((address.match(/[0-9]+$/) || ['0'])[0], 10);
 
-  if (!id)
+  if (!epId)
   {
     return done(new Error('Invalid address.'));
   }
@@ -242,23 +242,26 @@ function scrapePage(config: IConfig, address: string, done: (err: Error, page?: 
 
     if (!swf || !data)
     {
-      log.warn('Something wrong in the page at ' + address + ' (data are: ' + look + ')');
-      log.warn('Setting Season to 0 and episode to ’0’...');
+      log.warn('Somethig unexpected in the page at ' + address + ' (data are: ' + look + ')');
+      log.warn('Setting Season to ’0’ and episode to ’0’...');
       done(null, {
-          id: id,
-          episode: '0',
-          series: seasonTitle,
-          swf: swf[1],
-          volume: '0'
+        episode: '0',
+        id: epId,
+        series: seasonTitle,
+        swf: swf[1],
+        volume: '0',
       });
     }
-    done(null, {
-      id: id,
-      episode: data[3],
-      series: data[1],
-      swf: swf[1],
-      volume: data[2] || '1'
-    });
+    else
+    {
+      done(null, {
+        episode: data[3],
+        id: epId,
+        series: data[1],
+        swf: swf[1],
+        volume: data[2] || '1',
+      });
+    }
   });
 }
 
@@ -276,7 +279,7 @@ function scrapePlayer(config: IConfig, address: string, id: number, done: (err: 
 
   request.post(config, {
     form: {current_page: address},
-    url: url[1] + '/xml/?req=RpcApiVideoPlayer_GetStandardConfig&media_id=' + id
+    url: url[1] + '/xml/?req=RpcApiVideoPlayer_GetStandardConfig&media_id=' + id,
   }, (err, result) =>
   {
     if (err)
@@ -286,35 +289,35 @@ function scrapePlayer(config: IConfig, address: string, id: number, done: (err: 
 
     xml2js.parseString(result, {
       explicitArray: false,
-      explicitRoot: false
-    }, (err: Error, player: IEpisodePlayerConfig) =>
+      explicitRoot: false,
+    }, (errPS: Error, player: IEpisodePlayerConfig) =>
     {
-      if (err)
+      if (errPS)
       {
-        return done(err);
+        return done(errPS);
       }
 
       try
       {
         const isSubtitled = Boolean(player['default:preload'].subtitle);
-		let streamMode = 'RTMP';
+        let streamMode = 'RTMP';
 
-		if (player['default:preload'].stream_info.host === '')
+        if (player['default:preload'].stream_info.host === '')
 		{
 			streamMode = 'HLS';
 		}
 
         done(null, {
           subtitle: isSubtitled ? {
+            data: player['default:preload'].subtitle.data,
             id: parseInt(player['default:preload'].subtitle.$.id, 10),
             iv: player['default:preload'].subtitle.iv,
-            data: player['default:preload'].subtitle.data
           } : null,
           video: {
-            mode: streamMode,
             file: player['default:preload'].stream_info.file,
-            host: player['default:preload'].stream_info.host
-          }
+            host: player['default:preload'].stream_info.host,
+            mode: streamMode,
+          },
         });
       } catch (parseError)
       {
