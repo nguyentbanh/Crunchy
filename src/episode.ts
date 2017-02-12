@@ -235,7 +235,7 @@ function scrapePage(config: IConfig, address: string, done: (err: Error, page?: 
 
     const $ = cheerio.load(result);
     const swf = /^([^?]+)/.exec($('link[rel=video_src]').attr('href'));
-    const regexp = /\s*([^\n\r\t\f]+)\n?\s*[^0-9]*([0-9][0-9.]*)?,?\n?\s\s*[^0-9]*((PV )?[S0-9][P0-9.]*[a-fA-F]?)/;
+    const regexp = /\s*([^\n\r\t\f]+)\n?\s*[^0-9]*([0-9][\-0-9.]*)?,?\n?\s\s*[^0-9]*((PV )?[S0-9][P0-9.]*[a-fA-F]?)/;
     const look = $('#showmedia_about_media').text();
     const seasonTitle = $('span[itemprop="title"]').text();
     const data = regexp.exec(look);

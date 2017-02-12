@@ -2,6 +2,7 @@
 import cheerio = require('cheerio');
 import episode from './episode';
 import fs = require('fs');
+const fse = require('fs-extra');
 import request = require('./request');
 import path = require('path');
 import url = require('url');
@@ -15,7 +16,10 @@ export default function(config: IConfig, address: string, done: (err: Error) => 
 {
   const persistentPath = path.join(config.output || process.cwd(), persistent);
 
-  fs.readFile(persistentPath, 'utf8', (err, contents) =>
+  /* Make a backup of the persistent file in case of */
+  fse.copySync(persistentPath, persistentPath + '.backup');
+
+  fs.readFile(persistentPath, 'utf8', (err: Error, contents: string) =>
   {
     const cache = config.cache ? {} : JSON.parse(contents || '{}');
 
@@ -40,7 +44,7 @@ export default function(config: IConfig, address: string, done: (err: Error) => 
           if ((ignored === false) || (ignored === undefined))
           {
             const newCache = JSON.stringify(cache, null, '  ');
-            fs.writeFile(persistentPath, newCache, (errW) =>
+            fs.writeFile(persistentPath, newCache, (errW: Error) =>
             {
               if (errW)
               {
@@ -124,6 +128,7 @@ function page(config: IConfig, address: string, done: (err: Error, result?: ISer
 {
   if (address[0] === '@')
   {
+    log.info('Trying to fetch from ' + address.substr(1));
     const episodes: ISeriesEpisode[] = [];
     episodes.push({
       address: address.substr(1),
@@ -134,6 +139,7 @@ function page(config: IConfig, address: string, done: (err: Error, result?: ISer
   }
   else
   {
+    let episodeCount = 0;
     request.get(config, address, (err, result) => {
       if (err) {
         return done(err);
@@ -155,20 +161,24 @@ function page(config: IConfig, address: string, done: (err: Error, result?: ISer
         }
 
         const volume = /([0-9]+)\s*$/.exec($(el).closest('ul').prev('a').text());
-        const regexp = /Episode\s+((PV )?[S0-9][P0-9.]*[a-fA-F]?)\s*$/i;
+        const regexp = /Episode\s+((PV )?[S0-9][\-P0-9.]*[a-fA-F]?)\s*$/i;
         const episode = regexp.exec($(el).children('.series-title').text());
         const url = $(el).attr('href');
 
         if ((!url) || (!episode)) {
           return;
         }
+        episodeCount += 1;
         episodes.push({
           address: url,
           episode: episode[1],
           volume: volume ? parseInt(volume[0], 10) : 1,
         });
       });
-
+      if (episodeCount === 0)
+      {
+        log.warn("No episodes found for " + title + ". Could it be a movie?");
+      }
       done(null, {episodes: episodes.reverse(), series: title});
     });
   }
