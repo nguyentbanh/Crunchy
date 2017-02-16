@@ -10,6 +10,21 @@ import log  = require('./log');
 const persistent = '.crpersistent';
 
 /**
+ * Check if a file exist..
+ */
+function fileExist(path: string)
+{
+  try
+  {
+    fs.statSync(path);
+    return true;
+  } catch (e)
+  {
+    return false;
+  }
+}
+
+/**
  * Streams the series to disk.
  */
 export default function(config: IConfig, address: string, done: (err: Error) => void)
@@ -17,7 +32,10 @@ export default function(config: IConfig, address: string, done: (err: Error) => 
   const persistentPath = path.join(config.output || process.cwd(), persistent);
 
   /* Make a backup of the persistent file in case of */
-  fse.copySync(persistentPath, persistentPath + '.backup');
+  if (fileExist(persistentPath))
+  {
+    fse.copySync(persistentPath, persistentPath + '.backup');
+  }
 
   fs.readFile(persistentPath, 'utf8', (err: Error, contents: string) =>
   {
