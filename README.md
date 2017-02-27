@@ -94,6 +94,7 @@ Download *Fairy Tail* to `C:\Anime`:
 * `-u or --user <s>` sets the e-mail address or username.
 
  _Please remember that login has to be done for each call of Crunchy, as none of the credentials are stored_
+
 ##### Disables
 
 * `-c or --cache` disables the cache.
