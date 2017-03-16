@@ -21,7 +21,7 @@ It is recommended to enable authentication (`-p` and `-u`) so your account permi
 
 ## Prerequisites
 
-* NodeJS >= 0.12.x (http://nodejs.org/)
+* NodeJS >= 5.x (http://nodejs.org/)
 * NPM >= 2.5.x (https://www.npmjs.org/)
 
 ## Installation
