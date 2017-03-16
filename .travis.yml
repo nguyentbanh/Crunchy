@@ -1,0 +1,12 @@
+language: node_js
+node_js:
+ - '0.12'
+before_install:
+ - npm install -g tsconfig-lint
+ - npm install -g tslint
+ - npm install -g typescript
+ - npm install -g typings
+script:
+ - npm run types
+ - npm run compile
+ - npm test
