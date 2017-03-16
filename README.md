@@ -1,5 +1,7 @@
 # Crunchy: a fork of Deathspike/CrunchyRoll.js
 
+[![Issue Stats](http://issuestats.com/github/Godzil/Crunchy/badge/issue)](http://issuestats.com/github/Godzil/Crunchy)
+
 *Crunchy* is capable of downloading *anime* episodes from the popular *CrunchyRoll* streaming service. An episode is stored in the original video format (often H.264 in a MP4 container) and the configured subtitle format (ASS or SRT).The two output files are then merged into a single MKV file.
 
 ## Motivation
