@@ -196,7 +196,17 @@ function name(config: IConfig, page: IEpisodePage, series: string, extra: string
   const volume = (volumeNum < 10 ? '0' : '') + page.volume;
   const tag = config.tag || 'CrunchyRoll';
 
-  return series + ' - s' + volume + 'e' + episode + ' - [' + tag + ']' + extra;
+  if (!config.filename) {
+    return page.series + ' - s' + volume + 'e' + episode + ' - [' + tag + ']' + extra;
+  }
+
+  return config.filename
+      .replace(/{EPISODE_ID}/g, page.id.toString())
+      .replace(/{EPISODE_NUMBER}/g, episode)
+      .replace(/{SEASON_NUMBER}/g, volume)
+      .replace(/{VOLUME_NUMBER}/g, volume)
+      .replace(/{SERIES_TITLE}/g, series)
+      .replace(/{TAG}/g, tag) + extra;
 }
 
 /**

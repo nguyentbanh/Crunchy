@@ -12,5 +12,6 @@ interface IConfig {
   format?: string;
   output?: string;
   series?: string;
+  filename?: string;
   tag?: string;
 }
