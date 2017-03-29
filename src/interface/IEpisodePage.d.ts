@@ -3,5 +3,7 @@ interface IEpisodePage {
   episode: string;
   series: string;
   volume: string;
+  season: string;
+  title: string;
   swf: string;
 }
