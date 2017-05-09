@@ -121,3 +121,8 @@ More information will be added at a later point. For now the recommendations are
 * Atom with `atom-typescript` and `linter-tslint` (and dependencies).
 
 Since this project uses TypeScript, compile with `node ts` or `npm install`.
+
+#### A note about pull requests:
+If you want to help working on this project, Pull request are welcome, but please explain the goal of your changes, and do a pull request per change: you want to add support for _X_, _Y_ and _Z_, make a pull request for X, one for Y and one for Z. I'm not saying a pull request per commit that would be idiotic.
+The idea is if your pull request changes lots of thing at the same time, if just a single part can't be accepted, if will delay the acceptation of the whole pull request where some of the feature could be integrated quicker is they were requested alone.
+Also if for example the change _Y_ depends on _X_, you can wait for _X_ to be accepted before requesting for _Y_, if they are independant you can send a pull request for each at the same time.
