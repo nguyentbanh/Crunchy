@@ -196,7 +196,20 @@ function name(config: IConfig, page: IEpisodePage, series: string, extra: string
   const volume = (volumeNum < 10 ? '0' : '') + page.volume;
   const tag = config.tag || 'CrunchyRoll';
 
-  return series + ' - s' + volume + 'e' + episode + ' - [' + tag + ']' + extra;
+  if (!config.filename) {
+    return page.series + ' - s' + volume + 'e' + episode + ' - [' + tag + ']' + extra;
+  }
+
+  return config.filename
+      .replace(/{EPISODE_ID}/g, page.id.toString())
+      .replace(/{EPISODE_NUMBER}/g, episode)
+      .replace(/{SEASON_NUMBER}/g, volume)
+      .replace(/{VOLUME_NUMBER}/g, volume)
+      .replace(/{SEASON_TITLE}/g, page.season)
+      .replace(/{VOLUME_TITLE}/g, page.season)
+      .replace(/{SERIES_TITLE}/g, series)
+      .replace(/{EPISODE_TITLE}/g, page.title)
+      .replace(/{TAG}/g, tag) + extra;
 }
 
 /**
@@ -238,6 +251,7 @@ function scrapePage(config: IConfig, address: string, done: (err: Error, page?: 
     const regexp = /\s*([^\n\r\t\f]+)\n?\s*[^0-9]*([0-9][\-0-9.]*)?,?\n?\s\s*[^0-9]*((PV )?[S0-9][P0-9.]*[a-fA-F]?)/;
     const look = $('#showmedia_about_media').text();
     const seasonTitle = $('span[itemprop="title"]').text();
+    let episodeTitle = $('#showmedia_about_name').text().replace(/[“”]/g, '');
     const data = regexp.exec(look);
 
     if (!swf || !data)
@@ -248,6 +262,8 @@ function scrapePage(config: IConfig, address: string, done: (err: Error, page?: 
         episode: '0',
         id: epId,
         series: seasonTitle,
+        season: seasonTitle,
+        title: episodeTitle,
         swf: swf[1],
         volume: '0',
       });
@@ -258,6 +274,8 @@ function scrapePage(config: IConfig, address: string, done: (err: Error, page?: 
         episode: data[3],
         id: epId,
         series: data[1],
+        season: seasonTitle,
+        title: episodeTitle,
         swf: swf[1],
         volume: data[2] || '1',
       });

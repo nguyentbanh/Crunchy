@@ -149,6 +149,7 @@ function parse(args: string[]): IConfigLine
     .option('-f, --format <s>', 'The subtitle format. (Default: ass)')
     .option('-o, --output <s>', 'The output path.')
     .option('-s, --series <s>', 'The series override.')
+    .option('-n, --filename <s>', 'The name override.')
     .option('-t, --tag <s>', 'The subgroup. (Default: CrunchyRoll)')
     .parse(args);
 }
