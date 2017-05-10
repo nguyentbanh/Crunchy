@@ -114,6 +114,36 @@ Download *Fairy Tail* to `C:\Anime`:
 * `-s or --series <s>` sets the series override.
 * `-t or --tag <s>` sets The subgroup. (Default: CrunchyRoll)
 
+## When things goes wrong
+
+First, make sure you have the latest version of Crunchy installed, if you run an older version, the issue you face may have been solved.
+
+Second thing to check, you have to give your credentials (-u and -p parameters) each time you run Crunchy. It does not actually store the token it receive when login and need to relog each time it is called. This may change in the future.
+
+Third, is it a recently released episode? If yes, sometimes CR have issues were the requested format is not available, and Crunchy is not able to get it. When in doubt, try to watch CR website, if it does not work there, Crunchy will not either. This is valid in all cases even on non recently released.
+
+Fourth, sometimes, CR website does weird things, and there are some transient errors, wait a couple of minutes (or hours) and try again. It often solved the issue on my side (yes I know that's not really a way of fixing, but if the error is on CR side, Crunchy can't do anything)
+
+If really nothing works or you find a problem with Crunchy, then you can go and fill an Issue, first read the already open and closed one to make sure you are not reporting an existing problem. If your problem has been already reported, what you can do is to either:
+- Add a comment saying you also have the same issue
+- Add a Thumbs Up reaction to the original entry in the issue, they will are used as a metric to know how many people are annoyed by that issue
+If you find one which correspond and is close, don't hesitate to add a comment, the issue may have not be fully solved.
+
+If there is no comparable opened or close issue, you can create a new one.
+
+### What to put in a bug report
+It is really important for me to know:
+- on which Operating System you are running Crunchy,
+- which anime you want to fetch if it is related to a specific one, 
+- The command line you use to run Crunchy
+- What message Crunchy is giving you if any
+
+**Please be careful to remove your real account login and password if they appear!**
+
+Also don't hesitate to add labels you feel apropriate on your report.
+
+_Note: You can also use a bug report for a feature requests._
+
 ## Developers
 
 More information will be added at a later point. For now the recommendations are:
