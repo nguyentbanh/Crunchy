@@ -63,6 +63,12 @@ function fileExist(path: string)
   }
 }
 
+function sanitiseFileName(str: string)
+{
+  return str.replace('/', '_').replace('\'', '_').replace(':', '_').replace('?', '_')
+            .replace('*', '_').replace('\"', '_').replace('<', '_').replace('>', '_');
+}
+
 /**
  * Downloads the subtitle and video.
  */
@@ -70,8 +76,8 @@ function download(config: IConfig, page: IEpisodePage, player: IEpisodePlayer, d
 {
   let series = config.series || page.series;
 
-  series = series.replace('/', '_').replace('\'', '_').replace(':', '_');
-  let fileName = name(config, page, series, '').replace('/', '_').replace('\'', '_').replace(':', '_');
+  series = sanitiseFileName(series);
+  let fileName = sanitiseFileName(name(config, page, series, ''));
   let filePath = path.join(config.output || process.cwd(), series, fileName);
 
   if (fileExist(filePath + '.mkv'))
@@ -82,7 +88,7 @@ function download(config: IConfig, page: IEpisodePage, player: IEpisodePlayer, d
     do
     {
       count = count + 1;
-      fileName = name(config, page, series, '-' + count).replace('/', '_').replace('\'', '_').replace(':', '_');
+      fileName = sanitiseFileName(name(config, page, series, '-' + count));
       filePath = path.join(config.output || process.cwd(), series, fileName);
     } while (fileExist(filePath + '.mkv'));
 
