@@ -2,7 +2,7 @@
 import cheerio = require('cheerio');
 import fs = require('fs');
 import mkdirp = require('mkdirp');
-import request = require('./request');
+import my_request = require('./my_request');
 import path = require('path');
 import subtitle from './subtitle/index';
 import video from './video/index';
@@ -245,7 +245,7 @@ function scrapePage(config: IConfig, address: string, done: (err: Error, page?: 
     return done(new Error('Invalid address.'));
   }
 
-  request.get(config, address, (err, result) =>
+  my_request.get(config, address, (err, result) =>
   {
     if (err)
     {
@@ -301,7 +301,7 @@ function scrapePlayer(config: IConfig, address: string, id: number, done: (err: 
     return done(new Error('Invalid address.'));
   }
 
-  request.post(config, {
+  my_request.post(config, {
     form: {current_page: address},
     url: url[1] + '/xml/?req=RpcApiVideoPlayer_GetStandardConfig&media_id=' + id,
   }, (err, result) =>

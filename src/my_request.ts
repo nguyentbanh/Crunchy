@@ -16,7 +16,7 @@ const defaultHeaders: request.Headers =
 /**
  * Performs a GET request for the resource.
  */
-export function get(config: IConfig, options: request.Options, done: (err: Error, result?: string) => void)
+export function get(config: IConfig, options: string|request.Options, done: (err: Error, result?: string) => void)
 {
   authenticate(config, err =>
   {

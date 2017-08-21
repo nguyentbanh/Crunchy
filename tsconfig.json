@@ -31,7 +31,7 @@
         "src/interface/ISubtitle.d.ts",
         "src/interface/ISubtitleEvent.d.ts",
         "src/interface/ISubtitleStyle.d.ts",
-        "src/request.ts",
+        "src/my_request.ts",
         "src/series.ts",
         "src/subtitle/decode.ts",
         "src/subtitle/formats/ass.ts",

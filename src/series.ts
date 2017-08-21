@@ -3,7 +3,7 @@ import cheerio = require('cheerio');
 import episode from './episode';
 import fs = require('fs');
 const fse = require('fs-extra');
-import request = require('./request');
+import my_request = require('./my_request');
 import path = require('path');
 import url = require('url');
 import log  = require('./log');
@@ -158,7 +158,7 @@ function page(config: IConfig, address: string, done: (err: Error, result?: ISer
   else
   {
     let episodeCount = 0;
-    request.get(config, address, (err, result) => {
+    my_request.get(config, address, (err, result) => {
       if (err) {
         return done(err);
       }
