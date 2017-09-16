@@ -28,7 +28,7 @@ export function warn(str: string)
 export function dispEpisode(name: string, status: string, addNL: boolean)
 {
   /* Do fancy output */
-  process.stdout.write(' \x1B[1;33m> \x1B[37m' + name + '\x1B[0m : \x1B[33m' + status + '\x1B[0m\x1B[0G');
+  process.stdout.write('\x1B[K \x1B[1;33m> \x1B[37m' + name + '\x1B[0m : \x1B[33m' + status + '\x1B[0m\x1B[0G');
 
   if (addNL)
   {

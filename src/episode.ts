@@ -65,8 +65,7 @@ function fileExist(path: string)
 
 function sanitiseFileName(str: string)
 {
-  return str.replace('/', '_').replace('\'', '_').replace(':', '_').replace('?', '_')
-            .replace('*', '_').replace('\"', '_').replace('<', '_').replace('>', '_');
+  return str.replace(/[\/':\?\*"<>\.]/g, '_');
 }
 
 /**
@@ -102,6 +101,7 @@ function download(config: IConfig, page: IEpisodePage, player: IEpisodePlayer, d
       return done(errM, false);
     }
 
+    log.dispEpisode(fileName, 'Fetching...', false);
     downloadSubtitle(config, player, filePath, (errDS) =>
     {
       if (errDS)
@@ -112,7 +112,7 @@ function download(config: IConfig, page: IEpisodePage, player: IEpisodePlayer, d
       const now = Date.now();
       if (player.video.file !== undefined)
       {
-        log.dispEpisode(fileName, 'Fetching...', false);
+        log.dispEpisode(fileName, 'Fetching video...', false);
         downloadVideo(config, page, player, filePath, (errDV) =>
         {
           if (errDV)
@@ -127,6 +127,7 @@ function download(config: IConfig, page: IEpisodePage, player: IEpisodePlayer, d
 
           const isSubtited = Boolean(player.subtitle);
 
+          log.dispEpisode(fileName, 'Merging...', false);
           video.merge(config, isSubtited, player.video.file, filePath, player.video.mode, (errVM) =>
           {
             if (errVM)
