@@ -1,7 +1,8 @@
 'use strict';
 import childProcess = require('child_process');
-import path = require('path');
 import os = require('os');
+import path = require('path');
+
 import log  = require('../log');
 
 /**

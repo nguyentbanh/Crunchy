@@ -1,14 +1,14 @@
 /* tslint:disable:no-bitwise false */
 'use strict';
-import crypto = require('crypto');
 import bigInt = require('big-integer');
+import crypto = require('crypto');
 import zlib = require('zlib');
 
 /**
  * Decodes the data.
  */
- export default function(id: number, iv: Buffer|string, data: Buffer|string,
-                         done: (err?: Error, result?: Buffer) => void)
+export default function(id: number, iv: Buffer|string, data: Buffer|string,
+                        done: (err?: Error, result?: Buffer) => void)
 {
   try
   {

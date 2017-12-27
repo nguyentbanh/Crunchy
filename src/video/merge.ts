@@ -1,15 +1,16 @@
 'use strict';
 import childProcess = require('child_process');
 import fs = require('fs');
-import path = require('path');
 import os = require('os');
+import path = require('path');
+
 import subtitle from '../subtitle/index';
 
 /**
  * Merges the subtitle and video files into a Matroska Multimedia Container.
  */
- export default function(config: IConfig, isSubtitled: boolean, rtmpInputPath: string, filePath: string,
-                         streamMode: string, done: (err: Error) => void)
+export default function(config: IConfig, isSubtitled: boolean, rtmpInputPath: string, filePath: string,
+                        streamMode: string, done: (err: Error) => void)
 {
   const subtitlePath = filePath + '.' + (subtitle.formats[config.format] ? config.format : 'ass');
   let videoPath = filePath;
