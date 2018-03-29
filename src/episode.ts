@@ -303,7 +303,12 @@ function scrapePlayer(config: IConfig, address: string, id: number, done: (err: 
   }
 
   my_request.post(config, {
-    form: {current_page: address},
+    form: {
+      current_page: address,
+      video_format: config.video_format,
+      video_quality: config.video_quality,
+      media_id: id
+    },
     url: url[1] + '/xml/?req=RpcApiVideoPlayer_GetStandardConfig&media_id=' + id,
   }, (err, result) =>
   {
@@ -328,9 +333,9 @@ function scrapePlayer(config: IConfig, address: string, id: number, done: (err: 
         let streamMode = 'RTMP';
 
         if (player['default:preload'].stream_info.host === '')
-		{
-			streamMode = 'HLS';
-		}
+        {
+          streamMode = 'HLS';
+        }
 
         done(null, {
           subtitle: isSubtitled ? {

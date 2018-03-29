@@ -14,4 +14,7 @@ interface IConfig {
   series?: string;
   filename?: string;
   tag?: string;
+  resolution?: string;
+  video_format?: string;
+  video_quality?: string;
 }
