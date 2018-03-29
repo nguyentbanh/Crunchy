@@ -9,8 +9,10 @@ let isPremium = false;
 
 const defaultHeaders: request.Headers =
 {
-  'User-Agent': 'Mozilla/5.0 (Windows NT 6.2; WOW64; rv:34.0) Gecko/20100101 Firefox/34.0',
-  'Connection': 'keep-alive'
+  'User-Agent': 'Mozilla/5.0 (Windows NT 6.2; WOW64; x64; rv:58.0) Gecko/20100101 Firefox/58.0',
+  //             Mozilla/5.0 (Windows NT 6.2; WOW64; rv:34.0) Gecko/20100101 Firefox/34.0',
+  'Connection': 'keep-alive',
+  'Referer': 'https://www.crunchyroll.com/login'
 };
 
 /**
@@ -99,9 +101,9 @@ function authenticate(config: IConfig, done: (err: Error) => void)
       headers: defaultHeaders,
       form:
       {
-        'login_form[redirect_url]': '/',
         'login_form[name]': config.user,
         'login_form[password]': config.pass,
+        'login_form[redirect_url]': '/',
         'login_form[_token]': token
       },
       jar: true,
