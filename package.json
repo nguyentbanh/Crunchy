@@ -17,7 +17,8 @@
   },
   "version": "1.2.0",
   "bin": {
-    "crunchy": "./bin/crunchy"
+    "crunchy": "./bin/crunchy",
+    "crunchy.sh": "./bin/crunchy.sh"
   },
   "dependencies": {
     "big-integer": "^1.6.27",
