@@ -1,7 +1,7 @@
 #!/bin/bash
 PARAMS=$*
 for i in {1..20}; do
-	crunchy -u ${PARAMS}
+	crunchy ${PARAMS}
 	if [ $? == 0 ]; then
 	 	break
 	fi
