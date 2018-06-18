@@ -66,18 +66,24 @@ The [command-line interface](http://en.wikipedia.org/wiki/Command-line_interface
 
     Options:
 
-      -h, --help         output usage information
-      -V, --version      output the version number
-      -p, --pass <s>     The password.
-      -u, --user <s>     The e-mail address or username.
-      -c, --cache        Disables the cache.
-      -m, --merge        Disables merging subtitles and videos.
-      -e, --episode <i>  The episode filter.
-      -v, --volume <i>   The volume filter.
-      -f, --format <s>   The subtitle format. (Default: ass)
-      -o, --output <s>   The output path.
-      -s, --series <s>   The series override.
-      -t, --tag <s>      The subgroup. (Default: CrunchyRoll)
+       -V, --version         output the version number
+       -p, --pass <s>        The password.
+       -u, --user <s>        The e-mail address or username.
+       -c, --cache           Disables the cache.
+       -m, --merge           Disables merging subtitles and videos.
+       -e, --episode <i>     The episode filter.
+       -v, --volume <i>      The volume filter.
+       -f, --format <s>      The subtitle format. (Default: ass)
+       -o, --output <s>      The output path.
+       -s, --series <s>      The series override.
+       -n, --filename <s>    The name override.
+       -t, --tag <s>         The subgroup. (Default: CrunchyRoll) (default: CrunchyRoll)
+       -r, --resolution <s>  The video resolution. (Default: 1080 (360, 480, 720, 1080)) (default: 1080)
+       -g, --rebuildcrp      Rebuild the crpersistant file.
+       -b, --batch <s>       Batch file (default: CrunchyRoll.txt)
+       --verbose             Make tool verbose
+       --retry <i>           Number or time to retry fetching an episode. Default: 5 (default: 5)
+       -h, --help            output usage information
 
 #### Batch-mode
 
@@ -97,7 +103,7 @@ Download *Fairy Tail* to `C:\Anime`:
 
     crunchy --output C:\Anime http://www.crunchyroll.com/fairy-tail
 
-#### Switches
+#### Command line parameters
 
 ##### Authentication
 
@@ -108,7 +114,7 @@ Download *Fairy Tail* to `C:\Anime`:
 
 ##### Disables
 
-* `-c or --cache` disables the cache.
+* `-c or --cache` disables the cache in batch mode.
 * `-m or --merge` disables merging subtitles and videos.
 
 ##### Filters
@@ -116,12 +122,23 @@ Download *Fairy Tail* to `C:\Anime`:
 * `-e or --episode <i>` filters episodes (positive is greater than, negative is smaller than).
 * `-v or --volume <i>` filters volumes (positive is greater than, negative is smaller than).
 
+_These parameters are probably extremely buggy at the moment..._
+
 ##### Settings
 
 * `-f or --format <s>` sets the subtitle format. (Default: ass)
 * `-o or --output <s>` sets the output path.
 * `-s or --series <s>` sets the series override.
 * `-t or --tag <s>` sets The subgroup. (Default: CrunchyRoll)
+* `-r or --resolution <s>` sets the resolutoin you want to download (360, 480, 720, 1080)
+* `--retry <i>` set the number of try Crunchy will use if downloading a serie or episode fail
+
+##### Others
+
+* `-b or --batch <s>` specify the batch file to use. Default to "CrunchyRoll.txt"
+* `--verbose` make Crunchy really verbose. You should use it only for bug reporting or to try to see why it does not work
+* `-g or --rebuildcrp` use that parameter only if the .crpersistent file has been corrupted and Crunchy try to redownload everything. It will try to rebuild the cache file from the file if find. If you renamed of move any file they will be ignored and not added to the cache file.
+
 
 ## When things goes wrong
 
@@ -131,27 +148,14 @@ Second thing to check, you have to give your credentials (-u and -p parameters) 
 
 Third, is it a recently released episode? If yes, sometimes CR have issues were the requested format is not available, and Crunchy is not able to get it. When in doubt, try to watch CR website, if it does not work there, Crunchy will not either. This is valid in all cases even on non recently released.
 
-Fourth, sometimes, CR website does weird things, and there are some transient errors, wait a couple of minutes (or hours) and try again. It often solved the issue on my side (yes I know that's not really a way of fixing, but if the error is on CR side, Crunchy can't do anything)
+Fourth, sometimes, CR website does weird things, and there are some transient errors, wait a couple of minutes (or hours) and try again. It has really often solved lots of weird issue on my side (yes I know that's not really a way of fixing, but if the error is on CR side, Crunchy can't do anything)
 
 If really nothing works or you find a problem with Crunchy, then you can go and fill an Issue, first read the already open and closed one to make sure you are not reporting an existing problem. If your problem has been already reported, what you can do is to either:
 - Add a comment saying you also have the same issue
-- Add a Thumbs Up reaction to the original entry in the issue, they will are used as a metric to know how many people are annoyed by that issue
-If you find one which correspond and is close, don't hesitate to add a comment, the issue may have not be fully solved.
+- Add a Thumbs Up reaction to the original entry in the issue, I use them as a metric to know how many people are annoyed by that issue
+If you find one which correspond and it is close, don't hesitate to add a comment, the issue may have not be fully solved.
 
-If there is no comparable opened or close issue, you can create a new one.
-
-### What to put in a bug report
-It is really important for me to know:
-- on which Operating System you are running Crunchy,
-- which anime you want to fetch if it is related to a specific one, 
-- The command line you use to run Crunchy
-- What message Crunchy is giving you if any
-
-**Please be careful to remove your real account login and password if they appear!**
-
-Also don't hesitate to add labels you feel apropriate on your report.
-
-_Note: You can also use a bug report for a feature requests._
+If there is no comparable opened or close issue, you are welcome to create a new one.
 
 ## Developers
 
@@ -159,9 +163,5 @@ More information will be added at a later point. For now the recommendations are
 
 * Atom with `atom-typescript` and `linter-tslint` (and dependencies).
 
-Since this project uses TypeScript, compile with `node ts` or `npm install`.
+Since this project uses TypeScript, compile with `node run compile` to build the tool and `npm run test` to run the linter.
 
-#### A note about pull requests:
-If you want to help working on this project, Pull request are welcome, but please explain the goal of your changes, and do a pull request per change: you want to add support for _X_, _Y_ and _Z_, make a pull request for X, one for Y and one for Z. I'm not saying a pull request per commit that would be idiotic.
-The idea is if your pull request changes lots of thing at the same time, if just a single part can't be accepted, if will delay the acceptation of the whole pull request where some of the feature could be integrated quicker is they were requested alone.
-Also if for example the change _Y_ depends on _X_, you can wait for _X_ to be accepted before requesting for _Y_, if they are independant you can send a pull request for each at the same time.

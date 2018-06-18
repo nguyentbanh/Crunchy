@@ -7,29 +7,25 @@ about: Create a report to help us improve
 **Describe the bug**
 A clear and concise description of what the bug is.
 
-**To Reproduce**
-Steps to reproduce the behavior:
-1. Go to '...'
-2. Click on '....'
-3. Scroll down to '....'
-4. See error
-
 **Expected behavior**
 A clear and concise description of what you expected to happen.
 
 **Screenshots**
 If applicable, add screenshots to help explain your problem.
 
-**Desktop (please complete the following information):**
- - OS: [e.g. iOS]
- - Browser [e.g. chrome, safari]
- - Version [e.g. 22]
+**Please fill theses informations:**
+(Add a X between brackets to make them ticked)
+ - OS: [e.g:. Windows 10, Mac OS X 10.13, ...]
+ - [ ] I'm using the latest version of Crunchy
+ - Serie you get a problem with (and specify which episode if it is specific to one):
+ - The command line you are running Crunchy with:
+ - The message Crunchy is giving you, if any:
 
-**Smartphone (please complete the following information):**
- - Device: [e.g. iPhone6]
- - OS: [e.g. iOS8.1]
- - Browser [e.g. stock browser, safari]
- - Version [e.g. 22]
+**Please be careful to remove your real account login and password if they appear!**
+
 
 **Additional context**
 Add any other context about the problem here.
+
+
+_Also don't hesitate to add labels you feel apropriate on your report._
