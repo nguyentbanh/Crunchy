@@ -26,7 +26,14 @@ batch(process.argv, (err: any) =>
 {
   if (err)
   {
-    console.error(err.stack || err);
+    if (err.stack)
+    {
+      console.error(err.stack || err);
+    }
+    else
+    {
+      console.error(err);
+    }
     process.exit(-1);
   }
   console.info('Done!');
