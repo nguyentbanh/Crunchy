@@ -58,7 +58,7 @@ export default function(config: IConfig, address: string, done: (err: Error) => 
           {
             if (page.episodes[i].retry <= 0)
             {
-              console.error(err.stack || err);
+              console.error(err);
               log.error('Cannot fetch episode "s' + page.episodes[i].volume + 'e' + page.episodes[i].episode +
                             '", please rerun later');
             }
@@ -66,7 +66,7 @@ export default function(config: IConfig, address: string, done: (err: Error) => 
             {
               if (config.verbose)
               {
-                console.error(errD.stack || errD);
+                console.error(errD);
               }
               log.warn('Retrying to fetch episode "s' + page.episodes[i].volume + 'e' + page.episodes[i].episode +
                            '" - Retry ' + page.episodes[i].retry + ' / ' + config.retry);
