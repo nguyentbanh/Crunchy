@@ -100,6 +100,8 @@ function download(config: IConfig, page: IEpisodePage, player: IEpisodePlayer, d
     } while (fileExist(filePath + '.mkv'));
 
     log.warn('Renaming to \'' + fileName + '\'...');
+
+    config.filename = fileName;
   }
 
   if (config.rebuildcrp)
