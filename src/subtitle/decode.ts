@@ -24,8 +24,8 @@ export default function(id: number, iv: Buffer|string, data: Buffer|string,
  */
 function decrypt(id: number, iv: Buffer|string, data: Buffer|string)
 {
-  const ivBuffer = typeof iv === 'string' ? new Buffer(iv, 'base64') : iv;
-  const dataBuffer = typeof data === 'string' ? new Buffer(data, 'base64') : data;
+  const ivBuffer = typeof iv === 'string' ? Buffer.from(iv, 'base64') : iv;
+  const dataBuffer = typeof data === 'string' ? Buffer.from(data, 'base64') : data;
   const decipher = crypto.createDecipheriv('aes-256-cbc', key(id), ivBuffer);
 
   decipher.setAutoPadding(false);
