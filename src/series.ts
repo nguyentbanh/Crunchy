@@ -58,12 +58,14 @@ export default function(config: IConfig, address: string, done: (err: Error) => 
           {
             if (page.episodes[i].retry <= 0)
             {
+              log.dispEpisode(config.filename, 'Error...', true);
               console.error(err);
               log.error('Cannot fetch episode "s' + page.episodes[i].volume + 'e' + page.episodes[i].episode +
                             '", please rerun later');
             }
             else
             {
+              log.dispEpisode(config.filename, 'Error...', true);
               if (config.verbose)
               {
                 console.error(errD);
