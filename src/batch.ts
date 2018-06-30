@@ -66,16 +66,18 @@ export default function(args: string[], done: (err?: Error) => void)
         {
           if (tasksArr[i].retry <= 0)
           {
-            console.error(err);
+            console.error(errin);
             log.error('Cannot get episodes from "' + tasksArr[i].address + '", please rerun later');
+            /* Go to the next on the list */
+            i += 1;
           }
           else
           {
             if (config.verbose)
             {
-              console.error(err);
+              console.error(errin);
             }
-            log.warn('Retrying to fetch episodes ' + tasksArr[i].retry + ' / ' + config.retry);
+            log.warn('Retrying to fetch episodes list from' + tasksArr[i].retry + ' / ' + config.retry);
             tasksArr[i].retry -= 1;
           }
         }
