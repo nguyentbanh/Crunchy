@@ -17,6 +17,7 @@ If applicable, add screenshots to help explain your problem.
 (Add a X between brackets to make them ticked)
  - OS: [e.g:. Windows 10, Mac OS X 10.13, ...]
  - [ ] I'm using the latest version of Crunchy
+ - [ ] I have a premium accrount on CR
  - Serie you get a problem with (and specify which episode if it is specific to one):
  - The command line you are running Crunchy with:
  - The message Crunchy is giving you, if any:
