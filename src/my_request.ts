@@ -187,7 +187,8 @@ function authenticate(config: IConfig, done: (err: Error) => void)
       if (isAuthenticated === false)
       {
         const error = $('ul.message, li.error').text();
-        return done(new Error('Authentication failed: ' + error));
+        log.error('Authentication failed: ' + error);
+        process.exit(-1);
       }
 
       if (isPremium === false)
