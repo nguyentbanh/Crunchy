@@ -71,8 +71,6 @@ The [command-line interface](http://en.wikipedia.org/wiki/Command-line_interface
        -u, --user <s>        The e-mail address or username.
        -c, --cache           Disables the cache.
        -m, --merge           Disables merging subtitles and videos.
-       -e, --episode <i>     The episode filter.
-       -v, --volume <i>      The volume filter.
        -f, --format <s>      The subtitle format. (Default: ass)
        -o, --output <s>      The output path.
        -s, --series <s>      The series override.
@@ -116,13 +114,6 @@ Download *Fairy Tail* to `C:\Anime`:
 
 * `-c or --cache` disables the cache in batch mode.
 * `-m or --merge` disables merging subtitles and videos.
-
-##### Filters
-
-* `-e or --episode <i>` filters episodes (positive is greater than, negative is smaller than).
-* `-v or --volume <i>` filters volumes (positive is greater than, negative is smaller than).
-
-_These parameters are probably extremely buggy at the moment..._
 
 ##### Settings
 

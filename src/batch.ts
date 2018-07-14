@@ -192,9 +192,6 @@ function parse(args: string[]): IConfigLine
     // Disables
     .option('-c, --cache', 'Disables the cache.')
     .option('-m, --merge', 'Disables merging subtitles and videos.')
-    // Filters
-    .option('-e, --episode <i>', 'The episode filter.')
-    .option('-v, --volume <i>', 'The volume filter.')
     // Settings
     .option('-f, --format <s>', 'The subtitle format. (Default: ass)')
     .option('-o, --output <s>', 'The output path.')

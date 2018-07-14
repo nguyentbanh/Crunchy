@@ -113,11 +113,6 @@ function download(cache: {[address: string]: number}, config: IConfig,
                   baseAddress: string, item: ISeriesEpisode,
                   done: (err: Error, ign: boolean) => void)
 {
-  if (!filter(config, item))
-  {
-    return done(null, false);
-  }
-
   const address = url.resolve(baseAddress, item.address);
 
   if (cache[address])
@@ -135,30 +130,6 @@ function download(cache: {[address: string]: number}, config: IConfig,
     cache[address] = Date.now();
     done(null, ignored);
   });
-}
-
-/**
- * Filters the item based on the configuration.
- */
-function filter(config: IConfig, item: ISeriesEpisode)
-{
-  // Filter on chapter.
-  const episodeFilter = config.episode;
-  // Filter on volume.
-  const volumeFilter = config.volume;
-
-  const currentEpisode = parseInt(item.episode, 10);
-  const currentVolume = item.volume;
-
-  if ( ( (episodeFilter > 0) && (currentEpisode <=  episodeFilter) ) ||
-       ( (episodeFilter < 0) && (currentEpisode >= -episodeFilter) ) ||
-       ( (volumeFilter  > 0) && (currentVolume  <=  volumeFilter ) ) ||
-       ( (volumeFilter  < 0) && (currentVolume  >= -volumeFilter ) ) )
-  {
-    return false;
-  }
-
-  return true;
 }
 
 /**
