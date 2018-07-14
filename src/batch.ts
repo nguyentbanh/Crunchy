@@ -44,6 +44,17 @@ export default function(args: string[], done: (err?: Error) => void)
     config.video_quality = resol_table['1080'].quality;
   }
 
+  if (config.debug)
+  {
+    /* Ugly but meh */
+    const tmp = JSON.parse(JSON.stringify(config));
+    tmp.pass = 'obfuscated';
+    tmp.user = 'obfustated';
+    tmp.rawArgs = undefined;
+    tmp.options = undefined;
+    log.dumpToDebug('Config', JSON.stringify(tmp), true);
+  }
+
   tasks(config, batchPath, (err, tasksArr) =>
   {
     if (err)
@@ -203,6 +214,7 @@ function parse(args: string[]): IConfigLine
     .option('-g, --rebuildcrp', 'Rebuild the crpersistant file.')
     .option('-b, --batch <s>', 'Batch file', 'CrunchyRoll.txt')
     .option('--verbose', 'Make tool verbose')
+    .option('--debug', 'Create a debug file. Use only if requested!')
     .option('--retry <i>', 'Number or time to retry fetching an episode. Default: 5', 5)
     .parse(args);
 }

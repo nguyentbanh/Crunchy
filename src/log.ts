@@ -1,7 +1,8 @@
 'use strict';
 import os = require('os');
+import fs = require('fs-extra');
 
-export function error(str: string)
+export function error(str: string|Error)
 {
   /* Do fancy output */
   console.error(' \x1B[1;31m* ERROR\x1B[0m: ' + str);
@@ -34,4 +35,21 @@ export function dispEpisode(name: string, status: string, addNL: boolean)
   {
     console.log('');
   }
+}
+
+export function dumpToDebug(what: string, data: any, create = false)
+{
+  if (create)
+  {
+    fs.writeFile('debug.txt', '>>>>>>>> ' + what + ':\n' + data + '\n<<<<<<<<\n', (err) =>
+    {
+      if (err) throw err;
+    });
+    return;
+  }
+
+  fs.appendFile('debug.txt', '>>>>>>>> ' + what + ':\n' + data + '\n<<<<<<<<\n', (err) =>
+  {
+    if (err) throw err;
+  });
 }

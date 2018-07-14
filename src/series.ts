@@ -59,7 +59,7 @@ export default function(config: IConfig, address: string, done: (err: Error) => 
             if (page.episodes[i].retry <= 0)
             {
               log.dispEpisode(config.filename, 'Error...', true);
-              console.error(errD);
+              log.error(errD);
               log.error('Cannot fetch episode "s' + page.episodes[i].volume + 'e' + page.episodes[i].episode +
                             '", please rerun later');
               /* Go to the next on the list */
@@ -68,9 +68,15 @@ export default function(config: IConfig, address: string, done: (err: Error) => 
             else
             {
               log.dispEpisode(config.filename, 'Error...', true);
-              if (config.verbose)
+              if ((config.verbose) || (config.debug))
               {
-                console.error(errD);
+                if (config.debug)
+                {
+                  log.dumpToDebug('series address', address);
+                  log.dumpToDebug('series error', errD.stack || errD);
+                  log.dumpToDebug('series data', JSON.stringify(page));
+                }
+                log.error(errD);
               }
               log.warn('Retrying to fetch episode "s' + page.episodes[i].volume + 'e' + page.episodes[i].episode +
                            '" - Retry ' + page.episodes[i].retry + ' / ' + config.retry);
@@ -161,6 +167,11 @@ function page(config: IConfig, address: string, done: (err: Error, result?: ISer
       const title = $('span[itemprop=name]').text();
 
       if (!title) {
+        if (config.debug)
+        {
+          log.dumpToDebug('inval page addr', address);
+          log.dumpToDebug('inval page data', $);
+        }
         return done(new Error('Invalid page.(' + address + ')'));
       }
 

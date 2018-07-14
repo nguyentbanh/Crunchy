@@ -17,5 +17,6 @@ interface IConfig {
   rebuildcrp?: boolean;
   batch?: string;
   verbose?: boolean;
+  debug?: boolean;
   retry?: number;
 }
