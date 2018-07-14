@@ -127,9 +127,15 @@ export function post(config: IConfig, options: request.Options, done: (err: Erro
  */
 function authenticate(config: IConfig, done: (err: Error) => void)
 {
-  if (isAuthenticated || !config.pass || !config.user)
+  if (isAuthenticated)
   {
-      return done(null);
+    return done(null);
+  }
+
+  if (!config.pass || !config.user)
+  {
+    log.error('You need to give login/password to use Crunchy');
+    process.exit(-1);
   }
 
   startSession()
@@ -190,7 +196,7 @@ function authenticate(config: IConfig, done: (err: Error) => void)
       }
       else
       {
-          log.info('You have a premium account! Good!');
+        log.info('You have a premium account! Good!');
       }
       done(null);
     });
