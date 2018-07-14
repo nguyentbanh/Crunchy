@@ -4,7 +4,7 @@ import xml2js = require('xml2js');
 /**
  * Converts an input buffer to a SubStation Alpha subtitle.
  */
-export default function(input: string|Buffer, done: (err: Error, subtitle?: string) => void)
+export default function(config: IConfig, input: string|Buffer, done: (err: Error, subtitle?: string) => void)
 {
   xml2js.parseString(input.toString(), {
     explicitArray: false,
@@ -18,9 +18,9 @@ export default function(input: string|Buffer, done: (err: Error, subtitle?: stri
 
     try
     {
-      done(null, script(xml) + '\n' +
+      done(null, script(config, xml) + '\n' +
           style(xml.styles) + '\n' +
-          event(xml.events));
+          event(config, xml.events));
     } catch (err)
     {
       done(err);
@@ -31,7 +31,7 @@ export default function(input: string|Buffer, done: (err: Error, subtitle?: stri
 /**
  * Converts the event block.
  */
-function event(block: ISubtitleEvent): string
+function event(config: IConfig, block: ISubtitleEvent): string
 {
   const format = 'Layer,Start,End,Style,Name,MarginL,MarginR,MarginV,Effect,Text';
 
@@ -51,10 +51,11 @@ function event(block: ISubtitleEvent): string
 /**
  * Converts the script block.
  */
-function script(block: ISubtitle): string
+function script(config: IConfig, block: ISubtitle): string
 {
 
   return '[Script Info]\n' +
+         'Origin: Downloaded from Crunchyroll.com  by ' + config.user + '\n' +
          'Title: ' + block.$.title + '\n' +
          'ScriptType: v4.00+\n' +
          'WrapStyle: ' + block.$.wrap_style + '\n' +

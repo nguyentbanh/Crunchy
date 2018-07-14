@@ -1,3 +1,3 @@
 interface IFormatterTable {
-  [key: string]: (input: string|Buffer, done: (err: Error, subtitle?: string) => void) => void;
+  [key: string]: (config: IConfig, input: string|Buffer, done: (err: Error, subtitle?: string) => void) => void;
 }

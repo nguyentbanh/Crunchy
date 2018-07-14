@@ -186,7 +186,7 @@ function downloadSubtitle(config: IConfig, player: IEpisodePlayer, filePath: str
     const formats = subtitle.formats;
     const format = formats[config.format] ? config.format : 'ass';
 
-    formats[format](data, (errF: Error, decodedSubtitle: string) =>
+    formats[format](config, data, (errF: Error, decodedSubtitle: string) =>
     {
       if (errF)
       {

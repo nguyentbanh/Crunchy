@@ -4,7 +4,7 @@ import xml2js = require('xml2js');
 /**
  * Converts an input buffer to a SubRip subtitle.
  */
-export default function(input: Buffer|string, done: (err: Error, subtitle?: string) => void)
+export default function(config: IConfig, input: Buffer|string, done: (err: Error, subtitle?: string) => void)
 {
   const options = {explicitArray: false, explicitRoot: false};
 
