@@ -12,11 +12,11 @@
 
 This application is not endorsed or affliated with *CrunchyRoll*. The usage of this application enables episodes to be downloaded for offline convenience which may be forbidden by law in your country. Usage of this application may also cause a violation of the agreed *Terms of Service* between you and the stream provider. A tool is not responsible for your actions; please make an informed decision prior to using this application.
 
-**PLEASE _ONLY_ USE THIS TOOL IF YOU HAVE A _PREMIUM ACCOUNT_**
+**_ONLY_ USE THIS TOOL IF YOU HAVE A _PREMIUM ACCOUNT_**
 
 ## Configuration
 
-It is recommended to enable authentication (`-p` and `-u`) so your account permissions and settings are available for use. It is not possible to download non-free material without an account and premium subscription. Furthermore, the default account settings are used when downloading. If you want the highest quality videos, configure these preferences at https://www.crunchyroll.com/acct/?action=video.
+You need to authentication (`-p` and `-u`) to use Crunchy so you need to have an account on *CrunchyRool*. It is not possible to download non-free material without an account and premium subscription.
 
 
 ## Prerequisites
@@ -100,6 +100,12 @@ Download *Fairy Tail* to the current work directory:
 Download *Fairy Tail* to `C:\Anime`:
 
     crunchy --output C:\Anime http://www.crunchyroll.com/fairy-tail
+    
+Download episode 42 of *Fairy Tail* to `C:\Anime`:
+
+    crunchy --output C:\Anime @http://www.crunchyroll.com/fairy-tail/episode-46-the-silver-labyrinth-662721
+
+  Notice the '@' in front of the URL, it is there to tell Crunchy that the URL is an episode URL and not a series URL.
 
 #### Command line parameters
 
