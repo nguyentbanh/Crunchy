@@ -149,6 +149,52 @@ function split(value: string): string[]
   return pieces;
 }
 
+function get_min_filter(filter: string): number
+{
+  if (filter !== undefined)
+  {
+    const tok = filter.split('-');
+
+    if (tok.length > 2)
+    {
+      log.error('Invalid episode filter \'' + filter + '\'');
+      process.exit(-1);
+    }
+
+    if (tok[0] !== '')
+    {
+      return parseInt(tok[0], 10);
+    }
+  }
+  return 0;
+}
+
+function get_max_filter(filter: string): number
+{
+  if (filter !== undefined)
+  {
+    const tok = filter.split('-');
+
+    if (tok.length > 2)
+    {
+      log.error('Invalid episode filter \'' + filter + '\'');
+      process.exit(-1);
+    }
+
+    if ((tok.length > 1) && (tok[1] !== ''))
+    {
+      /* We have a max value */
+      return parseInt(tok[1], 10);
+    }
+    else if ((tok.length === 1) && (tok[0] !== ''))
+    {
+      /* A single episode has been requested */
+      return parseInt(tok[0], 10);
+    }
+  }
+  return +Infinity;
+}
+
 /**
  * Parses the configuration or reads the batch-mode file for tasks.
  */
@@ -156,11 +202,10 @@ function tasks(config: IConfigLine, batchPath: string, done: (err: Error, tasks?
 {
   if (config.args.length)
   {
-    const configIn = config;
-
     return done(null, config.args.map((addressIn) =>
     {
-      return {address: addressIn, config: configIn, retry: config.retry};
+      return {address: addressIn, retry: config.retry,
+              episode_min: get_min_filter(config.episodes), episode_max: get_max_filter(config.episodes)};
     }));
   }
 
@@ -196,7 +241,8 @@ function tasks(config: IConfigLine, batchPath: string, done: (err: Error, tasks?
             return;
           }
 
-          map.push({address: addressIn, config: lineConfig, retry: config.retry});
+          map.push({address: addressIn, retry: lineConfig.retry,
+                    episode_min: get_min_filter(lineConfig.episodes), episode_max: get_max_filter(lineConfig.episodes)});
         });
       });
       done(null, map);
@@ -216,6 +262,8 @@ function parse(args: string[]): IConfigLine
     // Disables
     .option('-c, --cache', 'Disables the cache.')
     .option('-m, --merge', 'Disables merging subtitles and videos.')
+    // Episode filter
+    .option('-e, --episodes <s>', 'Episode list. Read documentation on how to use')
     // Settings
     .option('-f, --format <s>', 'The subtitle format. (Default: ass)')
     .option('-o, --output <s>', 'The output path.')

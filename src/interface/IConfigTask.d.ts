@@ -1,5 +1,6 @@
 interface IConfigTask {
   address: string;
-  config: IConfigLine;
   retry: number;
+  episode_min: number;
+  episode_max: number;
 }

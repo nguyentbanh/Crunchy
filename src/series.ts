@@ -124,6 +124,14 @@ function download(cache: {[address: string]: number}, config: IConfig,
                   task: IConfigTask, item: ISeriesEpisode,
                   done: (err: Error, ign: boolean) => void)
 {
+  const episodeNumber = parseInt(item.episode, 10);
+
+  if ( (episodeNumber < task.episode_min) ||
+       (episodeNumber > task.episode_max) )
+  {
+    return done(null, false);
+  }
+
   const address = url.resolve(task.address, item.address);
 
   if (cache[address])

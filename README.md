@@ -71,6 +71,7 @@ The [command-line interface](http://en.wikipedia.org/wiki/Command-line_interface
        -u, --user <s>        The e-mail address or username.
        -c, --cache           Disables the cache.
        -m, --merge           Disables merging subtitles and videos.
+       -e, --episodes <s>    Episode list. Read documentation on how to use
        -f, --format <s>      The subtitle format. (Default: ass)
        -o, --output <s>      The output path.
        -s, --series <s>      The series override.
@@ -85,7 +86,7 @@ The [command-line interface](http://en.wikipedia.org/wiki/Command-line_interface
 
 #### Batch-mode
 
-When no sequence of series addresses is provided, the batch-mode source file will be read (which is *CrunchyRoll.txt* in the current work directory. Each line in this file is processed as a seperate command-line statement. This makes it ideal to manage a large sequence of series addresses with variating command-line options or incremental episode updates.
+When no sequence of series addresses is provided, the batch-mode source file will be read (which is *CrunchyRoll.txt* in the current work directory. Each line in this file is processed contain the URL of a series and can support some of the command line paramter (like *-e*). This makes it ideal to manage a large sequence of series addresses.
 
 #### Examples
 
@@ -100,12 +101,29 @@ Download *Fairy Tail* to the current work directory:
 Download *Fairy Tail* to `C:\Anime`:
 
     crunchy --output C:\Anime http://www.crunchyroll.com/fairy-tail
-    
+
 Download episode 42 of *Fairy Tail* to `C:\Anime`:
 
     crunchy --output C:\Anime @http://www.crunchyroll.com/fairy-tail/episode-46-the-silver-labyrinth-662721
 
-  Notice the '@' in front of the URL, it is there to tell Crunchy that the URL is an episode URL and not a series URL.
+  *Notice the '@' in front of the URL, it is there to tell Crunchy that the URL is an episode URL and not a series URL.*
+
+ or 
+    crunchy --output C:\Anime http://www.crunchyroll.com/fairy-tail -e 42
+
+Download episode 10 to 42 (both included) of *Fairy Tail*:
+
+    crunchy http://www.crunchyroll.com/fairy-tail -e 10-42
+
+Download episode up to 42 (included) of *Fairy Tail*:
+
+    crunchy http://www.crunchyroll.com/fairy-tail -e -42
+
+Download episodes starting from 42 to the last available of *Fairy Tail*:
+
+    crunchy http://www.crunchyroll.com/fairy-tail -e 42-
+
+
 
 #### Command line parameters
 
@@ -123,6 +141,7 @@ Download episode 42 of *Fairy Tail* to `C:\Anime`:
 
 ##### Settings
 
+* `-e or --episodes <s>` set an episode
 * `-f or --format <s>` sets the subtitle format. (Default: ass)
 * `-o or --output <s>` sets the output path.
 * `-s or --series <s>` sets the series override.

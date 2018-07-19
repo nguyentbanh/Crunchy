@@ -5,6 +5,7 @@ interface IConfig {
   // Disables
   cache?: boolean;
   merge?: boolean;
+  episodes?: string;
   // Settings
   format?: string;
   output?: string;
