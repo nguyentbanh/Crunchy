@@ -277,10 +277,21 @@ function scrapePage(config: IConfig, address: string, done: (err: Error, page?: 
     const episodeTitle = $('#showmedia_about_name').text().replace(/[“”]/g, '');
     const data = regexp.exec(look);
 
+    if (config.debug)
+    {
+      log.dumpToDebug('episode page', $.html());
+    }
+
     if (!swf || !data)
     {
       log.warn('Somethig unexpected in the page at ' + address + ' (data are: ' + look + ')');
       log.warn('Setting Season to ’0’ and episode to ’0’...');
+
+      if (config.debug)
+      {
+        log.dumpToDebug('episode unexpected', look);
+      }
+
       done(null, {
         episode: '0',
         id: epId,
@@ -367,6 +378,11 @@ function scrapePlayer(config: IConfig, address: string, id: number, done: (err: 
         });
       } catch (parseError)
       {
+        if (config.debug)
+        {
+          log.dumpToDebug('player scrape', parseError);
+        }
+
         done(parseError);
       }
     });

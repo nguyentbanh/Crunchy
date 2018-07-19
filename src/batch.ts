@@ -77,7 +77,11 @@ export default function(args: string[], done: (err?: Error) => void)
         {
           if (tasksArr[i].retry <= 0)
           {
-            console.error(errin);
+            log.error(errin.stack || errin);
+            if (config.debug)
+            {
+              log.dumpToDebug('BatchGiveUp', errin.stack || errin);
+            }
             log.error('Cannot get episodes from "' + tasksArr[i].address + '", please rerun later');
             /* Go to the next on the list */
             i += 1;
@@ -86,7 +90,11 @@ export default function(args: string[], done: (err?: Error) => void)
           {
             if (config.verbose)
             {
-              console.error(errin);
+              log.error(errin);
+            }
+            if (config.debug)
+            {
+              log.dumpToDebug('BatchRetry', errin.stack || errin);
             }
             log.warn('Retrying to fetch episodes list from' + tasksArr[i].retry + ' / ' + config.retry);
             tasksArr[i].retry -= 1;

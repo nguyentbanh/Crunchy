@@ -51,6 +51,11 @@ export default function(config: IConfig, address: string, done: (err: Error) => 
       let i = 0;
       (function next()
       {
+        if (config.debug)
+        {
+          log.dumpToDebug('Episode ' + i, JSON.stringify(page.episodes[i]));
+        }
+
         if (i >= page.episodes.length) return done(null);
         download(cache, config, address, page.episodes[i], (errD, ignored) =>
         {
@@ -165,6 +170,11 @@ function page(config: IConfig, address: string, done: (err: Error, result?: ISer
 
       const $ = cheerio.load(result);
       const title = $('span[itemprop=name]').text();
+
+      if (config.debug)
+      {
+        log.dumpToDebug('serie page', $.html());
+      }
 
       if (!title) {
         if (config.debug)
