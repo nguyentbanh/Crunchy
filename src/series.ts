@@ -27,7 +27,7 @@ function fileExist(path: string)
 /**
  * Streams the series to disk.
  */
-export default function(config: IConfig, address: string, done: (err: Error) => void)
+export default function(config: IConfig, task: IConfigTask, done: (err: Error) => void)
 {
   const persistentPath = path.join(config.output || process.cwd(), persistent);
 
@@ -41,7 +41,7 @@ export default function(config: IConfig, address: string, done: (err: Error) => 
   {
     const cache = config.cache ? {} : JSON.parse(contents || '{}');
 
-    page(config, address, (errP, page) =>
+    pageScrape(config, task, (errP, page) =>
     {
       if (errP)
       {
@@ -57,7 +57,7 @@ export default function(config: IConfig, address: string, done: (err: Error) => 
         }
 
         if (i >= page.episodes.length) return done(null);
-        download(cache, config, address, page.episodes[i], (errD, ignored) =>
+        download(cache, config, task, page.episodes[i], (errD, ignored) =>
         {
           if (errD)
           {
@@ -77,7 +77,7 @@ export default function(config: IConfig, address: string, done: (err: Error) => 
               {
                 if (config.debug)
                 {
-                  log.dumpToDebug('series address', address);
+                  log.dumpToDebug('series address', task.address);
                   log.dumpToDebug('series error', errD.stack || errD);
                   log.dumpToDebug('series data', JSON.stringify(page));
                 }
@@ -121,10 +121,10 @@ export default function(config: IConfig, address: string, done: (err: Error) => 
  * Downloads the episode.
  */
 function download(cache: {[address: string]: number}, config: IConfig,
-                  baseAddress: string, item: ISeriesEpisode,
+                  task: IConfigTask, item: ISeriesEpisode,
                   done: (err: Error, ign: boolean) => void)
 {
-  const address = url.resolve(baseAddress, item.address);
+  const address = url.resolve(task.address, item.address);
 
   if (cache[address])
   {
@@ -146,14 +146,14 @@ function download(cache: {[address: string]: number}, config: IConfig,
 /**
  * Requests the page and scrapes the episodes and series.
  */
-function page(config: IConfig, address: string, done: (err: Error, result?: ISeries) => void)
+function pageScrape(config: IConfig, task: IConfigTask, done: (err: Error, result?: ISeries) => void)
 {
-  if (address[0] === '@')
+  if (task.address[0] === '@')
   {
-    log.info('Trying to fetch from ' + address.substr(1));
+    log.info('Trying to fetch from ' + task.address.substr(1));
     const episodes: ISeriesEpisode[] = [];
     episodes.push({
-      address: address.substr(1),
+      address: task.address.substr(1),
       episode: '',
       volume: 0,
       retry: config.retry,
@@ -163,7 +163,7 @@ function page(config: IConfig, address: string, done: (err: Error, result?: ISer
   else
   {
     let episodeCount = 0;
-    my_request.get(config, address, (err, result) => {
+    my_request.get(config, task.address, (err, result) => {
       if (err) {
         return done(err);
       }
@@ -179,10 +179,9 @@ function page(config: IConfig, address: string, done: (err: Error, result?: ISer
       if (!title) {
         if (config.debug)
         {
-          log.dumpToDebug('inval page addr', address);
-          log.dumpToDebug('inval page data', $);
+          log.dumpToDebug('missing title', task.address);
         }
-        return done(new Error('Invalid page.(' + address + ')'));
+        return done(new Error('Invalid page.(' + task.address + ')'));
       }
 
       log.info('Checking availability for ' + title);

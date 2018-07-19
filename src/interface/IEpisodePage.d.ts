@@ -6,4 +6,5 @@ interface IEpisodePage {
   season: string;
   title: string;
   swf: string;
+  filename: string;
 }

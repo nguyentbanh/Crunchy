@@ -71,7 +71,12 @@ export default function(args: string[], done: (err?: Error) => void)
         return done();
       }
 
-      series(tasksArr[i].config, tasksArr[i].address, (errin) =>
+      if (config.debug)
+      {
+        log.dumpToDebug('Task ' + i, JSON.stringify(tasksArr[i]));
+      }
+
+      series(config, tasksArr[i], (errin) =>
       {
         if (errin)
         {

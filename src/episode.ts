@@ -101,7 +101,7 @@ function download(config: IConfig, page: IEpisodePage, player: IEpisodePlayer, d
 
     log.warn('Renaming to \'' + fileName + '\'...');
 
-    config.filename = fileName;
+    page.filename = fileName;
   }
 
   if (config.rebuildcrp)
@@ -219,11 +219,11 @@ function name(config: IConfig, page: IEpisodePage, series: string, extra: string
   const volume = (volumeNum < 10 ? '0' : '') + page.volume;
   const tag = config.tag || 'CrunchyRoll';
 
-  if (!config.filename) {
+  if (!page.filename) {
     return page.series + ' - s' + volume + 'e' + episode + ' - [' + tag + ']' + extra;
   }
 
-  return config.filename
+  return page.filename
       .replace(/{EPISODE_ID}/g, page.id.toString())
       .replace(/{EPISODE_NUMBER}/g, episode)
       .replace(/{SEASON_NUMBER}/g, volume)
@@ -300,6 +300,7 @@ function scrapePage(config: IConfig, address: string, done: (err: Error, page?: 
         title: episodeTitle,
         swf: swf[1],
         volume: '0',
+        filename: '',
       });
     }
     else
@@ -312,6 +313,7 @@ function scrapePage(config: IConfig, address: string, done: (err: Error, page?: 
         title: episodeTitle,
         swf: swf[1],
         volume: data[2] || '1',
+        filename: '',
       });
     }
   });
