@@ -114,6 +114,7 @@ function download(config: IConfig, page: IEpisodePage, player: IEpisodePlayer, d
   {
     if (errM)
     {
+      log.dispEpisode(fileName, 'Error...', true);
       return done(errM, false);
     }
 
@@ -122,6 +123,7 @@ function download(config: IConfig, page: IEpisodePage, player: IEpisodePlayer, d
     {
       if (errDS)
       {
+        log.dispEpisode(fileName, 'Error...', true);
         return done(errDS, false);
       }
 
@@ -133,6 +135,7 @@ function download(config: IConfig, page: IEpisodePage, player: IEpisodePlayer, d
         {
           if (errDV)
           {
+            log.dispEpisode(fileName, 'Error...', true);
             return done(errDV, false);
           }
 
@@ -148,6 +151,7 @@ function download(config: IConfig, page: IEpisodePage, player: IEpisodePlayer, d
           {
             if (errVM)
             {
+              log.dispEpisode(fileName, 'Error...', true);
               return done(errVM, false);
             }
 

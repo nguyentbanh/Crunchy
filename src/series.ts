@@ -63,7 +63,6 @@ export default function(config: IConfig, task: IConfigTask, done: (err: Error) =
           {
             if (page.episodes[i].retry <= 0)
             {
-              log.dispEpisode(config.filename, 'Error...', true);
               log.error(errD);
               log.error('Cannot fetch episode "s' + page.episodes[i].volume + 'e' + page.episodes[i].episode +
                             '", please rerun later');
@@ -72,7 +71,6 @@ export default function(config: IConfig, task: IConfigTask, done: (err: Error) =
             }
             else
             {
-              log.dispEpisode(config.filename, 'Error...', true);
               if ((config.verbose) || (config.debug))
               {
                 if (config.debug)
