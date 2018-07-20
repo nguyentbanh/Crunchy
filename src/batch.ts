@@ -268,7 +268,7 @@ function parse(args: string[]): IConfigLine
     .option('-f, --format <s>', 'The subtitle format.', 'ass')
     .option('-o, --output <s>', 'The output path.')
     .option('-s, --series <s>', 'The series name override.')
-    .option('-n, --nametmpl <s>', 'Output name template', '{SERIES_TITLE} - s{SEASON_NUMBER}e{EPISODE_NUMBER} - [{TAG}]')
+    .option('-n, --nametmpl <s>', 'Output name template', '{SERIES_TITLE} - s{SEASON_NUMBER}e{EPISODE_NUMBER} - {EPISODE_TITLE} - [{TAG}]')
     .option('-t, --tag <s>', 'The subgroup.', 'CrunchyRoll')
     .option('-r, --resolution <s>', 'The video resolution. (valid: 360, 480, 720, 1080)', '1080')
     .option('-b, --batch <s>', 'Batch file', 'CrunchyRoll.txt')
