@@ -66,27 +66,27 @@ The [command-line interface](http://en.wikipedia.org/wiki/Command-line_interface
 
     Options:
 
-       -V, --version         output the version number
-       -p, --pass <s>        The password.
-       -u, --user <s>        The e-mail address or username.
-       -c, --cache           Disables the cache.
-       -m, --merge           Disables merging subtitles and videos.
-       -e, --episodes <s>    Episode list. Read documentation on how to use
-       -f, --format <s>      The subtitle format. (Default: ass)
-       -o, --output <s>      The output path.
-       -s, --series <s>      The series override.
-       -n, --filename <s>    The name override.
-       -t, --tag <s>         The subgroup. (Default: CrunchyRoll) (default: CrunchyRoll)
-       -r, --resolution <s>  The video resolution. (Default: 1080 (360, 480, 720, 1080)) (default: 1080)
-       -g, --rebuildcrp      Rebuild the crpersistant file.
-       -b, --batch <s>       Batch file (default: CrunchyRoll.txt)
-       --verbose             Make tool verbose
-       --retry <i>           Number or time to retry fetching an episode. Default: 5 (default: 5)
-       -h, --help            output usage information
+        -V, --version         output the version number
+        -p, --pass <s>        The password.
+        -u, --user <s>        The e-mail address or username.
+        -c, --cache           Disables the cache.
+        -m, --merge           Disables merging subtitles and videos.
+        -e, --episodes <s>    Episode list. Read documentation on how to use
+        -f, --format <s>      The subtitle format. (default: ass)
+        -o, --output <s>      The output path.
+        -s, --series <s>      The series name override.
+        -n, --nametmpl <s>    Output name template (default: {SERIES_TITLE} - s{SEASON_NUMBER}e{EPISODE_NUMBER} - [{TAG}])
+        -t, --tag <s>         The subgroup. (default: CrunchyRoll)
+        -r, --resolution <s>  The video resolution. (valid: 360, 480, 720, 1080) (default: 1080)
+        -b, --batch <s>       Batch file (default: CrunchyRoll.txt)
+        --verbose             Make tool verbose
+        --rebuildcrp          Rebuild the crpersistant file.
+        --retry <i>           Number or time to retry fetching an episode. (default: 5)
+        -h, --help            output usage information
 
 #### Batch-mode
 
-When no sequence of series addresses is provided, the batch-mode source file will be read (which is *CrunchyRoll.txt* in the current work directory. Each line in this file is processed contain the URL of a series and can support some of the command line paramter (like *-e*). This makes it ideal to manage a large sequence of series addresses.
+When no sequence of series addresses is provided, the batch-mode source file will be read (which is *CrunchyRoll.txt* in the current work directory. Each line in this file is processed contain the URL of a series and can support some of the command line parameter (like `-e`). This makes it ideal to manage a large sequence of series addresses.
 
 #### Examples
 
@@ -109,6 +109,7 @@ Download episode 42 of *Fairy Tail* to `C:\Anime`:
   *Notice the '@' in front of the URL, it is there to tell Crunchy that the URL is an episode URL and not a series URL.*
 
  or 
+
     crunchy --output C:\Anime http://www.crunchyroll.com/fairy-tail -e 42
 
 Download episode 10 to 42 (both included) of *Fairy Tail*:
