@@ -265,17 +265,16 @@ function parse(args: string[]): IConfigLine
     // Episode filter
     .option('-e, --episodes <s>', 'Episode list. Read documentation on how to use')
     // Settings
-    .option('-f, --format <s>', 'The subtitle format. (Default: ass)')
+    .option('-f, --format <s>', 'The subtitle format.', 'ass')
     .option('-o, --output <s>', 'The output path.')
-    .option('-s, --series <s>', 'The series override.')
-    .option('-t, --tag <s>', 'The subgroup. (Default: CrunchyRoll)', 'CrunchyRoll')
-    .option('-r, --resolution <s>', 'The video resolution. (Default: 1080 (360, 480, 720, 1080))',
-            '1080')
-    .option('-g, --rebuildcrp', 'Rebuild the crpersistant file.')
+    .option('-s, --series <s>', 'The series name override.')
     .option('-n, --nametmpl <s>', 'Output name template', '{SERIES_TITLE} - s{SEASON_NUMBER}e{EPISODE_NUMBER} - [{TAG}]')
+    .option('-t, --tag <s>', 'The subgroup.', 'CrunchyRoll')
+    .option('-r, --resolution <s>', 'The video resolution. (valid: 360, 480, 720, 1080)', '1080')
     .option('-b, --batch <s>', 'Batch file', 'CrunchyRoll.txt')
     .option('--verbose', 'Make tool verbose')
     .option('--debug', 'Create a debug file. Use only if requested!')
-    .option('--retry <i>', 'Number or time to retry fetching an episode. Default: 5', 5)
+    .option('--rebuildcrp', 'Rebuild the crpersistant file.')
+    .option('--retry <i>', 'Number or time to retry fetching an episode.', 5)
     .parse(args);
 }
