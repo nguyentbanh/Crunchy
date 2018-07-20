@@ -74,11 +74,10 @@ function sanitiseFileName(str: string)
  */
 function download(config: IConfig, page: IEpisodePage, player: IEpisodePlayer, done: (err: Error, ign: boolean) => void)
 {
-  let series = config.series || page.series;
+  const serieFolder = sanitiseFileName(config.series || page.series);
 
-  series = sanitiseFileName(series);
-  let fileName = sanitiseFileName(name(config, page, series, ''));
-  let filePath = path.join(config.output || process.cwd(), series, fileName);
+  let fileName = sanitiseFileName(generateName(config, page));
+  let filePath = path.join(config.output || process.cwd(), serieFolder, fileName);
 
   if (fileExist(filePath + '.mkv'))
   {
@@ -95,8 +94,8 @@ function download(config: IConfig, page: IEpisodePage, player: IEpisodePlayer, d
     do
     {
       count = count + 1;
-      fileName = sanitiseFileName(name(config, page, series, '-' + count));
-      filePath = path.join(config.output || process.cwd(), series, fileName);
+      fileName = sanitiseFileName(generateName(config, page, '-' + count));
+      filePath = path.join(config.output || process.cwd(), serieFolder, fileName);
     } while (fileExist(filePath + '.mkv'));
 
     log.warn('Renaming to \'' + fileName + '\'...');
@@ -215,19 +214,16 @@ function downloadVideo(config: IConfig,  page: IEpisodePage, player: IEpisodePla
 /**
  * Names the file based on the config, page, series and tag.
  */
-function name(config: IConfig, page: IEpisodePage, series: string, extra: string)
+function generateName(config: IConfig, page: IEpisodePage, extra = '')
 {
   const episodeNum = parseInt(page.episode, 10);
   const volumeNum = parseInt(page.volume, 10);
   const episode = (episodeNum < 10 ? '0' : '') + page.episode;
   const volume = (volumeNum < 10 ? '0' : '') + page.volume;
   const tag = config.tag || 'CrunchyRoll';
+  const series = config.series || page.series;
 
-  if (!page.filename) {
-    return page.series + ' - s' + volume + 'e' + episode + ' - [' + tag + ']' + extra;
-  }
-
-  return page.filename
+  return config.nametmpl
       .replace(/{EPISODE_ID}/g, page.id.toString())
       .replace(/{EPISODE_NUMBER}/g, episode)
       .replace(/{SEASON_NUMBER}/g, volume)

@@ -10,7 +10,7 @@ interface IConfig {
   format?: string;
   output?: string;
   series?: string;
-  filename?: string;
+  nametmpl?: string;
   tag?: string;
   resolution?: string;
   video_format?: string;

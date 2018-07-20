@@ -268,11 +268,11 @@ function parse(args: string[]): IConfigLine
     .option('-f, --format <s>', 'The subtitle format. (Default: ass)')
     .option('-o, --output <s>', 'The output path.')
     .option('-s, --series <s>', 'The series override.')
-    .option('-n, --filename <s>', 'The name override.')
     .option('-t, --tag <s>', 'The subgroup. (Default: CrunchyRoll)', 'CrunchyRoll')
     .option('-r, --resolution <s>', 'The video resolution. (Default: 1080 (360, 480, 720, 1080))',
             '1080')
     .option('-g, --rebuildcrp', 'Rebuild the crpersistant file.')
+    .option('-n, --nametmpl <s>', 'Output name template', '{SERIES_TITLE} - s{SEASON_NUMBER}e{EPISODE_NUMBER} - [{TAG}]')
     .option('-b, --batch <s>', 'Batch file', 'CrunchyRoll.txt')
     .option('--verbose', 'Make tool verbose')
     .option('--debug', 'Create a debug file. Use only if requested!')
