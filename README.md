@@ -92,37 +92,47 @@ When no sequence of series addresses is provided, the batch-mode source file wil
 
 Download in batch-mode:
 
-    crunchy
+ You will need to create the batch file (default name is `CrunchyRoll.txt`):
 
-Download *Fairy Tail* to the current work directory:
+    http://www.cr.com/tail-fairy
+    http://www.cr.com/gin-mama
+    http://www.cr.com/two-parts
+    // Just download episodes 3 to 42
+    http://www.cr.com/defense-of-dwarfs -e 3-42
 
-    crunchy http://www.crunchyroll.com/fairy-tail
+ Then launch crunchy:
 
-Download *Fairy Tail* to `C:\Anime`:
+    crunchy -u login -p password http://www.cr.com/tail-fairy
 
-    crunchy --output C:\Anime http://www.crunchyroll.com/fairy-tail
+Download *Tail Fairy* to the current work directory:
 
-Download episode 42 of *Fairy Tail* to `C:\Anime`:
+    crunchy -u login -p password http://www.cr.com/tail-fairy
 
-    crunchy --output C:\Anime @http://www.crunchyroll.com/fairy-tail/episode-46-the-silver-labyrinth-662721
+Download *Tail Fairy* to `C:\Anime`:
+
+    crunchy -u login -p password --output C:\Anime http://www.cr.com/tail-fairy
+
+Download episode 42 of *Tail Fairy* to `C:\Anime`:
+
+    crunchy -u login -p password --output C:\Anime @http://www.cr.com/tail-fairy/episode-42-the-episode-which-dont-exist-665544
 
   *Notice the '@' in front of the URL, it is there to tell Crunchy that the URL is an episode URL and not a series URL.*
 
  or 
 
-    crunchy --output C:\Anime http://www.crunchyroll.com/fairy-tail -e 42
+    crunchy -u login -p password --output C:\Anime http://www.cr.com/tail-fairy -e 42
 
-Download episode 10 to 42 (both included) of *Fairy Tail*:
+Download episode 10 to 42 (both included) of *Tail Fairy*:
 
-    crunchy http://www.crunchyroll.com/fairy-tail -e 10-42
+    crunchy -u login -p password http://www.cr.com/tail-fairy -e 10-42
 
-Download episode up to 42 (included) of *Fairy Tail*:
+Download episode up to 42 (included) of *Tail Fairy*:
 
-    crunchy http://www.crunchyroll.com/fairy-tail -e -42
+    crunchy -u login -p password http://www.cr.com/tail-fairy -e -42
 
-Download episodes starting from 42 to the last available of *Fairy Tail*:
+Download episodes starting from 42 to the last available of *Tail Fairy*:
 
-    crunchy http://www.crunchyroll.com/fairy-tail -e 42-
+    crunchy -u login -p password http://www.cr.com/tail-fairy -e 42-
 
 
 
