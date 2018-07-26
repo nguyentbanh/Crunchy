@@ -62,6 +62,11 @@ export default function(args: string[], done: (err?: Error) => void)
         return done(err);
     }
 
+    if (tasksArr[0].address === '')
+    {
+        return done();
+    }
+
     let i = 0;
 
     (function next()
@@ -80,12 +85,18 @@ export default function(args: string[], done: (err?: Error) => void)
       {
         if (errin)
         {
+          if (errin.error)
+          {
+            /* Error from the request, so ignore it */
+            tasksArr[i].retry = 0;
+          }
+
           if (tasksArr[i].retry <= 0)
           {
-            log.error(errin.stack || errin);
+            log.error(JSON.stringify(errin));
             if (config.debug)
             {
-              log.dumpToDebug('BatchGiveUp', errin.stack || errin);
+              log.dumpToDebug('BatchGiveUp', JSON.stringify(errin));
             }
             log.error('Cannot get episodes from "' + tasksArr[i].address + '", please rerun later');
             /* Go to the next on the list */
@@ -95,11 +106,11 @@ export default function(args: string[], done: (err?: Error) => void)
           {
             if (config.verbose)
             {
-              log.error(errin);
+              log.error(JSON.stringify(errin));
             }
             if (config.debug)
             {
-              log.dumpToDebug('BatchRetry', errin.stack || errin);
+              log.dumpToDebug('BatchRetry', JSON.stringify(errin));
             }
             log.warn('Retrying to fetch episodes list from' + tasksArr[i].retry + ' / ' + config.retry);
             tasksArr[i].retry -= 1;
@@ -196,6 +207,27 @@ function get_max_filter(filter: string): number
 }
 
 /**
+ * Check that URL start with http:// or https://
+ * As for some reason request just return an error but a useless one when that happen so check it
+ * soon enough.
+ */
+function checkURL(address: string): boolean
+{
+  if (address.startsWith('http:\/\/'))
+  {
+    return true;
+  }
+  if (address.startsWith('http:\/\/'))
+  {
+    return true;
+  }
+
+  log.error('URL ' + address + ' miss \'http:\/\/\' or \'https:\/\/\' => will be ignored');
+
+  return false;
+}
+
+/**
  * Parses the configuration or reads the batch-mode file for tasks.
  */
 function tasks(config: IConfigLine, batchPath: string, done: (err: Error, tasks?: IConfigTask[]) => void)
@@ -204,8 +236,13 @@ function tasks(config: IConfigLine, batchPath: string, done: (err: Error, tasks?
   {
     return done(null, config.args.map((addressIn) =>
     {
-      return {address: addressIn, retry: config.retry,
-              episode_min: get_min_filter(config.episodes), episode_max: get_max_filter(config.episodes)};
+      if (checkURL(addressIn))
+      {
+        return {address: addressIn, retry: config.retry,
+                episode_min: get_min_filter(config.episodes), episode_max: get_max_filter(config.episodes)};
+      }
+
+      return {address: '', retry: 0, episode_min: 0, episode_max: 0};
     }));
   }
 
@@ -241,8 +278,11 @@ function tasks(config: IConfigLine, batchPath: string, done: (err: Error, tasks?
             return;
           }
 
-          map.push({address: addressIn, retry: lineConfig.retry,
-                    episode_min: get_min_filter(lineConfig.episodes), episode_max: get_max_filter(lineConfig.episodes)});
+          if (checkURL(addressIn))
+          {
+            map.push({address: addressIn, retry: lineConfig.retry,
+                      episode_min: get_min_filter(lineConfig.episodes), episode_max: get_max_filter(lineConfig.episodes)});
+          }
         });
       });
       done(null, map);

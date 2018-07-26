@@ -27,7 +27,7 @@ function fileExist(path: string)
 /**
  * Streams the series to disk.
  */
-export default function(config: IConfig, task: IConfigTask, done: (err: Error) => void)
+export default function(config: IConfig, task: IConfigTask, done: (err: any) => void)
 {
   const persistentPath = path.join(config.output || process.cwd(), persistent);
 
@@ -45,6 +45,12 @@ export default function(config: IConfig, task: IConfigTask, done: (err: Error) =
     {
       if (errP)
       {
+        const reqErr = errP.error;
+        if ((reqErr.syscall === 'getaddrinfo') && (reqErr.errno === 'ENOTFOUND'))
+        {
+          log.error('The URL \'' + task.address + '\' is invalid, please check => I\'m ignoring it.');
+        }
+
         return done(errP);
       }
 
@@ -61,9 +67,17 @@ export default function(config: IConfig, task: IConfigTask, done: (err: Error) =
         {
           if (errD)
           {
+            /* Check if domain is valid */
+            const reqErr = errD.error;
+            if ((reqErr.syscall === 'getaddrinfo') && (reqErr.errno === 'ENOTFOUND'))
+            {
+               page.episodes[i].retry = 0;
+               log.error('The URL \'' + task.address + '\' is invalid, please check => I\'m ignoring it.');
+            }
+
             if (page.episodes[i].retry <= 0)
             {
-              log.error(errD);
+              log.error(JSON.stringify(errD));
               log.error('Cannot fetch episode "s' + page.episodes[i].volume + 'e' + page.episodes[i].episode +
                             '", please rerun later');
               /* Go to the next on the list */
@@ -76,7 +90,7 @@ export default function(config: IConfig, task: IConfigTask, done: (err: Error) =
                 if (config.debug)
                 {
                   log.dumpToDebug('series address', task.address);
-                  log.dumpToDebug('series error', errD.stack || errD);
+                  log.dumpToDebug('series error', JSON.stringify(errD));
                   log.dumpToDebug('series data', JSON.stringify(page));
                 }
                 log.error(errD);
@@ -120,7 +134,7 @@ export default function(config: IConfig, task: IConfigTask, done: (err: Error) =
  */
 function download(cache: {[address: string]: number}, config: IConfig,
                   task: IConfigTask, item: ISeriesEpisode,
-                  done: (err: Error, ign: boolean) => void)
+                  done: (err: any, ign: boolean) => void)
 {
   const episodeNumber = parseInt(item.episode, 10);
 
@@ -152,7 +166,7 @@ function download(cache: {[address: string]: number}, config: IConfig,
 /**
  * Requests the page and scrapes the episodes and series.
  */
-function pageScrape(config: IConfig, task: IConfigTask, done: (err: Error, result?: ISeries) => void)
+function pageScrape(config: IConfig, task: IConfigTask, done: (err: any, result?: ISeries) => void)
 {
   if (task.address[0] === '@')
   {
@@ -170,7 +184,8 @@ function pageScrape(config: IConfig, task: IConfigTask, done: (err: Error, resul
   {
     let episodeCount = 0;
     my_request.get(config, task.address, (err, result) => {
-      if (err) {
+      if (err)
+      {
         return done(err);
       }
 

@@ -82,7 +82,7 @@ function login(sessionId: string, user: string, pass: string): Promise<any>
 /**
  * Performs a GET request for the resource.
  */
-export function get(config: IConfig, options: string|request.Options, done: (err: Error, result?: string) => void)
+export function get(config: IConfig, options: string|request.Options, done: (err: any, result?: string) => void)
 {
   authenticate(config, (err) =>
   {
@@ -91,7 +91,7 @@ export function get(config: IConfig, options: string|request.Options, done: (err
       return done(err);
     }
 
-    cloudscraper.request(modify(options, 'GET'), (error: Error, response: any, body: any) =>
+    cloudscraper.request(modify(options, 'GET'), (error: any, response: any, body: any) =>
     {
       if (error) return done(error);
       done(null, typeof body === 'string' ? body : String(body));
