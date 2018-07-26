@@ -41,15 +41,9 @@ export function dumpToDebug(what: string, data: any, create = false)
 {
   if (create)
   {
-    fs.writeFile('debug.txt', '>>>>>>>> ' + what + ':\n' + data + '\n<<<<<<<<\n', (err) =>
-    {
-      if (err) throw err;
-    });
+    fs.writeFileSync('debug.txt', '>>>>>>>> ' + what + ':\n' + data + '\n<<<<<<<<\n');
     return;
   }
 
-  fs.appendFile('debug.txt', '>>>>>>>> ' + what + ':\n' + data + '\n<<<<<<<<\n', (err) =>
-  {
-    if (err) throw err;
-  });
+  fs.appendFileSync('debug.txt', '>>>>>>>> ' + what + ':\n' + data + '\n<<<<<<<<\n');
 }
