@@ -46,9 +46,12 @@ export default function(config: IConfig, task: IConfigTask, done: (err: any) => 
       if (errP)
       {
         const reqErr = errP.error;
-        if ((reqErr.syscall === 'getaddrinfo') && (reqErr.errno === 'ENOTFOUND'))
+        if ((reqErr !== undefined) && (reqErr.syscall))
         {
-          log.error('The URL \'' + task.address + '\' is invalid, please check => I\'m ignoring it.');
+          if ((reqErr.syscall === 'getaddrinfo') && (reqErr.errno === 'ENOTFOUND'))
+          {
+            log.error('The URL \'' + task.address + '\' is invalid, please check => I\'m ignoring it.');
+          }
         }
 
         return done(errP);
@@ -69,10 +72,13 @@ export default function(config: IConfig, task: IConfigTask, done: (err: any) => 
           {
             /* Check if domain is valid */
             const reqErr = errD.error;
-            if ((reqErr.syscall === 'getaddrinfo') && (reqErr.errno === 'ENOTFOUND'))
+            if ((reqErr !== undefined) && (reqErr.syscall))
             {
-               page.episodes[i].retry = 0;
-               log.error('The URL \'' + task.address + '\' is invalid, please check => I\'m ignoring it.');
+              if ((reqErr.syscall === 'getaddrinfo') && (reqErr.errno === 'ENOTFOUND'))
+              {
+                page.episodes[i].retry = 0;
+                log.error('The URL \'' + task.address + '\' is invalid, please check => I\'m ignoring it.');
+              }
             }
 
             if (page.episodes[i].retry <= 0)
