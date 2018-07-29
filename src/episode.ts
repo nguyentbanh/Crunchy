@@ -186,6 +186,11 @@ function downloadSubtitle(config: IConfig, player: IEpisodePlayer, filePath: str
       return done(errSD);
     }
 
+    if (config.debug)
+    {
+      log.dumpToDebug('SubtitlesXML', data);
+    }
+
     const formats = subtitle.formats;
     const format = formats[config.format] ? config.format : 'ass';
 
