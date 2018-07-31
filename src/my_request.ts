@@ -3,15 +3,22 @@ import cheerio = require('cheerio');
 import request = require('request');
 import rp = require('request-promise');
 import Promise = require('bluebird');
+import path = require('path');
+import fs = require('fs-extra');
 import log = require('./log');
+
 import { RequestPromise } from 'request-promise';
 import { Response } from 'request';
 
+// tslint:disable-next-line:no-var-requires
+const cookieStore = require('tough-cookie-file-store');
 // tslint:disable-next-line:no-var-requires
 const cloudscraper = require('cloudscraper');
 
 let isAuthenticated = false;
 let isPremium = false;
+
+let j: request.CookieJar;
 
 const defaultHeaders: request.Headers =
 {
@@ -69,6 +76,7 @@ function login(sessionId: string, user: string, pass: string): Promise<any>
       version: 'CR_API_VERSION',
     },
     json: true,
+    jar: j,
   })
   .then((response) =>
   {
@@ -78,12 +86,26 @@ function login(sessionId: string, user: string, pass: string): Promise<any>
 }
 
 // TODO: logout
+function loadCookies(config: IConfig)
+{
+  const cookiePath = path.join(config.output || process.cwd(), '.cookies.json');
+  if(!fs.existsSync(cookiePath))
+  {
+      fs.closeSync(fs.openSync(cookiePath, 'w'));
+  }
+  j = request.jar(new cookieStore(cookiePath));
+}
 
 /**
  * Performs a GET request for the resource.
  */
 export function get(config: IConfig, options: string|request.Options, done: (err: any, result?: string) => void)
 {
+  if (j === undefined)
+  {
+    loadCookies(config);
+  }
+
   authenticate(config, (err) =>
   {
     if (err)
@@ -104,6 +126,11 @@ export function get(config: IConfig, options: string|request.Options, done: (err
  */
 export function post(config: IConfig, options: request.Options, done: (err: Error, result?: string) => void)
 {
+  if (j === undefined)
+  {
+    loadCookies(config);
+  }
+
   authenticate(config, (err) =>
   {
     if (err)
@@ -153,7 +180,7 @@ function authenticate(config: IConfig, done: (err: Error) => void)
     const options =
     {
       headers: defaultHeaders,
-      jar: true,
+      jar: j,
       url: 'http://www.crunchyroll.com/',
       method: 'GET',
     };
@@ -212,13 +239,13 @@ function modify(options: string|request.Options, reqMethod: string): request.Opt
 {
   if (typeof options !== 'string')
   {
-    options.jar = true;
+    options.jar = j;
     options.headers = defaultHeaders;
     options.method = reqMethod;
     return options;
   }
   return {
-    jar: true,
+    jar: j,
     headers: defaultHeaders,
     url: options.toString(),
     method: reqMethod
