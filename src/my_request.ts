@@ -38,14 +38,14 @@ function startSession(config: IConfig): Promise<string>
   return rp(
   {
     method: 'GET',
-    url: 'CR_SESSION_URL',
+    url: config.crSessionUrl,
     qs:
     {
-      device_id: generateDeviceId(),
-      device_type: 'CR_DEVICE_TYPE',
-      access_token: 'CR_SESSION_KEY',
-      version: 'CR_API_VERSION',
-      locale: 'CR_LOCALE',
+      device_id: config.crDeviceId,
+      device_type: config.crDeviceType,
+      access_token: config.crSessionKey,
+      version: config.crAPIVersion,
+      locale: config.crLocale,
     },
     json: true,
   })
@@ -55,18 +55,18 @@ function startSession(config: IConfig): Promise<string>
   });
 }
 
-function login(sessionId: string, user: string, pass: string): Promise<any>
+function login(config: IConfig, sessionId: string, user: string, pass: string): Promise<any>
 {
   return rp(
   {
     method: 'POST',
-    url: 'CR_LOGIN_URL',
+    url:  config.crLoginUrl,
     form:
     {
       account: user,
       password: pass,
       session_id: sessionId,
-      version: 'CR_API_VERSION',
+      version: config.crAPIVersion,
     },
     json: true,
     jar: j,
@@ -168,11 +168,11 @@ function authenticate(config: IConfig, done: (err: Error) => void)
     process.exit(-1);
   }
 
-  startSession()
+  startSession(config)
   .then((sessionId: string) =>
   {
     defaultHeaders.Cookie = `sess_id=${sessionId}; c_locale=enUS`;
-    return login(sessionId, config.user, config.pass);
+    return login(config, sessionId, config.user, config.pass);
   })
   .then((userData) =>
   {
