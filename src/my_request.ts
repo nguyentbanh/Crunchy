@@ -51,6 +51,7 @@ function startSession(config: IConfig): Promise<string>
   })
   .then((response: any) =>
   {
+    if ((response.data === undefined) || (response.data.session_id === undefined)) throw new Error('Getting session failed: ' + JSON.stringify(response));
     return response.data.session_id;
   });
 }
