@@ -19,6 +19,7 @@ interface IConfig {
   batch?: string;
   verbose?: boolean;
   debug?: boolean;
+  unlog?: boolean;
   retry?: number;
   // Login options
   logUsingApi?: boolean;

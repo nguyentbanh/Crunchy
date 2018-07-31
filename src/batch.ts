@@ -3,6 +3,7 @@ import commander = require('commander');
 import fs = require('fs');
 import path = require('path');
 import log = require('./log');
+import my_request = require('./my_request');
 import cfg = require('./config');
 import series from './series';
 
@@ -26,6 +27,17 @@ export default function(args: string[], done: (err?: Error) => void)
 
   // Update the config file with new parameters
   cfg.save(config);
+
+  if (config.unlog)
+  {
+    config.crDeviceId = undefined;
+    config.user = undefined;
+    config.pass = undefined;
+    my_request.eatCookies(config);
+    cfg.save(config);
+    log.info("Unlogged!");
+    process.exit(0);
+  }
 
   // set resolution
   if (config.resolution)
@@ -307,6 +319,7 @@ function parse(args: string[]): IConfigLine
     // Authentication
     .option('-p, --pass <s>', 'The password.')
     .option('-u, --user <s>', 'The e-mail address or username.')
+    .option('-d, --unlog', 'Unlog')
     // Disables
     .option('-c, --cache', 'Disables the cache.')
     .option('-m, --merge', 'Disables merging subtitles and videos.')
