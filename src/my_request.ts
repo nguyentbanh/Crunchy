@@ -3,6 +3,7 @@ import cheerio = require('cheerio');
 import request = require('request');
 import rp = require('request-promise');
 import Promise = require('bluebird');
+import uuid = require('uuid');
 import path = require('path');
 import fs = require('fs-extra');
 import log = require('./log');
@@ -27,21 +28,13 @@ const defaultHeaders: request.Headers =
   'Referer': 'https://www.crunchyroll.com/login',
 };
 
-function generateDeviceId(): string
+function startSession(config: IConfig): Promise<string>
 {
-  let id = '';
-  const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-
-  for (let i = 0; i < 32; i++)
-  {
-    id += possible.charAt(Math.floor(Math.random() * possible.length));
+  if (config.crDeviceId === undefined)
+  { 
+    config.crDeviceId = uuid.v4();
   }
 
-  return id;
-}
-
-function startSession(): Promise<string>
-{
   return rp(
   {
     method: 'GET',
