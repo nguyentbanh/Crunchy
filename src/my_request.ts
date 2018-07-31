@@ -78,7 +78,6 @@ function login(sessionId: string, user: string, pass: string): Promise<any>
   });
 }
 
-// TODO: logout
 function loadCookies(config: IConfig)
 {
   const cookiePath = path.join(config.output || process.cwd(), '.cookies.json');
@@ -87,6 +86,17 @@ function loadCookies(config: IConfig)
       fs.closeSync(fs.openSync(cookiePath, 'w'));
   }
   j = request.jar(new cookieStore(cookiePath));
+}
+
+export function eatCookies(config: IConfig)
+{
+  const cookiePath = path.join(config.output || process.cwd(), '.cookies.json');
+
+  if(fs.existsSync(cookiePath))
+  {
+      fs.removeSync(cookiePath);
+  }
+  j = undefined;
 }
 
 /**
