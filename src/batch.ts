@@ -3,6 +3,7 @@ import commander = require('commander');
 import fs = require('fs');
 import path = require('path');
 import log = require('./log');
+import cfg = require('./config');
 import series from './series';
 
 /* correspondances between resolution and value CR excpect */
@@ -19,8 +20,12 @@ const resol_table: { [id: string]: IResolData; } =
  */
 export default function(args: string[], done: (err?: Error) => void)
 {
-  const config = parse(args);
+  const config = Object.assign(cfg.load(), parse(args));
+
   const batchPath = path.join(config.output || process.cwd(), config.batch);
+
+  // Update the config file with new parameters
+  cfg.save(config);
 
   // set resolution
   if (config.resolution)
@@ -73,6 +78,9 @@ export default function(args: string[], done: (err?: Error) => void)
     {
       if (i >= tasksArr.length)
       {
+        // Save configuration before leaving (should store info like session & other)
+        cfg.save(config);
+
         return done();
       }
 
