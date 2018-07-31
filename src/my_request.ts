@@ -221,8 +221,7 @@ function authenticate(config: IConfig, done: (err: Error) => void)
       }
       done(null);
     });
-  })
-  .catch(done);
+  });
 }
 
 /**
