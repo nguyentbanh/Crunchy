@@ -20,4 +20,15 @@ interface IConfig {
   verbose?: boolean;
   debug?: boolean;
   retry?: number;
+  // Login options
+  logUsingApi?: boolean;
+  crSessionUrl?: string;
+  crDeviceType?: string;
+  crAPIVersion?: string;
+  crLocale?: string;
+  crSessionKey?: string;
+  crLoginUrl?: string;
+  // Generated values
+  crDeviceId?: string;
+  crSessionId?: string;
 }
