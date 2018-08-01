@@ -111,7 +111,13 @@ export default function(args: string[], done: (err?: Error) => void)
             tasksArr[i].retry = 0;
           }
 
-          if (tasksArr[i].retry <= 0)
+          if (errin.authError)
+          {
+            /* Force a graceful exit */
+            log.error(errin.message);
+            i = tasksArr.length;
+          }
+          else if (tasksArr[i].retry <= 0)
           {
             log.error(JSON.stringify(errin));
             if (config.debug)

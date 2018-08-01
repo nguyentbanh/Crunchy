@@ -30,13 +30,13 @@ const defaultHeaders: request.Headers =
   'Referer': 'https://www.crunchyroll.com/login',
 };
 
-function startSession(config: IConfig): Promise<string>
+function AuthError(msg: string): IAuthError
 {
-  if (config.crDeviceId === undefined)
-  { 
-    config.crDeviceId = uuid.v4();
-  }
+  return { name: 'AuthError', message: msg, authError: true };
+}
 
+function startSession(config: IConfig): Promise<any>
+{
   return rp(
   {
     method: 'GET',
@@ -53,7 +53,11 @@ function startSession(config: IConfig): Promise<string>
   })
   .then((response: any) =>
   {
-    if ((response.data === undefined) || (response.data.session_id === undefined)) throw new Error('Getting session failed: ' + JSON.stringify(response));
+    if ((response.data === undefined) || (response.data.session_id === undefined))
+    {
+      throw new Error('Getting session failed: ' + JSON.stringify(response));
+    }
+
     return response.data.session_id;
   });
 }
@@ -127,7 +131,7 @@ function checkIfUserIsAuth(config: IConfig, done: (err: Error) => void): void
     if (isAuthenticated === false)
     {
         const error = $('ul.message, li.error').text();
-        return done(new Error('Authentication failed: ' + error));
+        return done(AuthError('Authentication failed: ' + error));
     }
     else
     {
@@ -246,6 +250,17 @@ function authenticate(config: IConfig, done: (err: Error) => void)
 
     if (config.logUsingApi)
     {
+      if (config.crDeviceId === undefined)
+      {
+        config.crDeviceId = uuid.v4();
+      }
+
+      if (!config.crSessionUrl || !config.crDeviceType || !config.crAPIVersion ||
+          !config.crLocale || !config.crLoginUrl)
+      {
+        return done(AuthError('Invalid API configuration, please check your config file.'));
+      }
+
       startSession(config)
       .then((sessionId: string) =>
       {
@@ -265,6 +280,10 @@ function authenticate(config: IConfig, done: (err: Error) => void)
             return done(errCheckAuth2);
           }
         });
+      })
+      .catch((errInChk) =>
+      {
+        return done(AuthError(errInChk.message));
       });
     }
     else if (config.logUsingCookie)
@@ -289,6 +308,7 @@ function authenticate(config: IConfig, done: (err: Error) => void)
     else
     {
       log.error('This method of login is currently unsupported...\n');
+      return done(AuthError('Unsupported login method'));
     }
 
   });
