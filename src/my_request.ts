@@ -25,7 +25,7 @@ let j: request.CookieJar;
 
 const defaultHeaders: request.Headers =
 {
-  'User-Agent': 'Mozilla/5.0 (Windows NT 6.2; WOW64; x64; rv:58.0) Gecko/20100101 Firefox/58.0',
+  'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36',
   'Connection': 'keep-alive',
   'Referer': 'https://www.crunchyroll.com/login',
 };
