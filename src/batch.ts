@@ -22,8 +22,16 @@ const resol_table: { [id: string]: IResolData; } =
 export default function(args: string[], done: (err?: Error) => void)
 {
   const config = Object.assign(cfg.load(), parse(args));
+  let batchPath;
 
-  const batchPath = path.join(config.output || process.cwd(), config.batch);
+  if (path.isAbsolute(config.batch))
+  {
+    batchPath = path.normalize(config.batch);
+  }
+  else
+  {
+    batchPath = path.normalize(path.join(process.cwd(), config.batch));
+  }
 
   // Update the config file with new parameters
   cfg.save(config);
