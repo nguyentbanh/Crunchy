@@ -79,6 +79,70 @@ function login(config: IConfig, sessionId: string, user: string, pass: string): 
   });
 }
 
+function checkIfUserIsAuth(config: IConfig, done: (err: Error) => void): void
+{
+  if (j === undefined)
+  {
+    loadCookies(config);
+  }
+
+  /**
+   * The main page give us some information about the user
+   */
+  const options =
+  {
+    headers: defaultHeaders,
+    jar: j,
+    url: 'http://www.crunchyroll.com/',
+    method: 'GET',
+  };
+  cloudscraper.request(options, (err: Error, rep: string, body: string) =>
+  {
+    if (err)
+    {
+      return done(err);
+    }
+
+    const $ = cheerio.load(body);
+
+    /* Check if auth worked */
+    const regexps = /ga\('set', 'dimension[5-8]', '([^']*)'\);/g;
+    const dims = regexps.exec($('script').text());
+
+    for (let i = 1; i < 5; i++)
+    {
+      if ((dims[i] !== undefined) && (dims[i] !== '') && (dims[i] !== 'not-registered'))
+      {
+        isAuthenticated = true;
+      }
+
+      if ((dims[i] === 'premium') || (dims[i] === 'premiumplus'))
+      {
+        isPremium = true;
+      }
+    }
+
+    if (isAuthenticated === false)
+    {
+        const error = $('ul.message, li.error').text();
+        return done(new Error('Authentication failed: ' + error));
+    }
+    else
+    {
+      if (isPremium === false)
+      {
+        log.warn('Do not use this app without a premium account.');
+      }
+      else
+      {
+        log.info('You have a premium account! Good!');
+      }
+    }
+
+    done(null);
+  });
+}
+
 function loadCookies(config: IConfig)
 {
   const cookiePath = path.join(config.output || process.cwd(), '.cookies.json');
@@ -163,75 +227,49 @@ function authenticate(config: IConfig, done: (err: Error) => void)
     return done(null);
   }
 
-  if (!config.pass || !config.user)
+  /* First of all, check if the user is not already logged via the cookies */
+  checkIfUserIsAuth(config, (errCheckAuth) =>
   {
-    log.error('You need to give login/password to use Crunchy');
-    process.exit(-1);
-  }
-
-  startSession(config)
-  .then((sessionId: string) =>
-  {
-    defaultHeaders.Cookie = `sess_id=${sessionId}; c_locale=enUS`;
-    return login(config, sessionId, config.user, config.pass);
-  })
-  .then((userData) =>
-  {
-    /**
-     * The page return with a meta based redirection, as we wan't to check that everything is fine, reload
-     * the main page. A bit convoluted, but more sure.
-     */
-    const options =
+    if (isAuthenticated)
     {
-      headers: defaultHeaders,
-      jar: j,
-      url: 'http://www.crunchyroll.com/',
-      method: 'GET',
-    };
+      return done(null);
+    }
 
-    cloudscraper.request(options, (err: Error, rep: string, body: string) =>
+    /* So if we are here now, that mean we are not authenticated so do as usual */
+    if (!config.pass || !config.user)
     {
-      if (err)
+      log.error('You need to give login/password to use Crunchy');
+      process.exit(-1);
+    }
+
+    if (config.logUsingApi)
+    {
+      startSession(config)
+      .then((sessionId: string) =>
       {
-         return done(err);
-      }
-
-      const $ = cheerio.load(body);
-
-      /* Check if auth worked */
-      const regexps = /ga\('set', 'dimension[5-8]', '([^']*)'\);/g;
-      const dims = regexps.exec($('script').text());
-
-      for (let i = 1; i < 5; i++)
+        defaultHeaders.Cookie = `sess_id=${sessionId}; c_locale=enUS`;
+        return login(config, sessionId, config.user, config.pass);
+      })
+      .then((userData) =>
       {
-        if ((dims[i] !== undefined) && (dims[i] !== '') && (dims[i] !== 'not-registered'))
+        checkIfUserIsAuth(config, (errCheckAuth2) =>
         {
-            isAuthenticated = true;
-        }
+          if (isAuthenticated)
+          {
+            return done(null);
+          }
+          else
+          {
+            return done(errCheckAuth2);
+          }
+        });
+      });
+    }
+    else
+    {
+      log.error('This method of login is currently unsupported...\n');
+    }
 
-        if ((dims[i] === 'premium') || (dims[i] === 'premiumplus'))
-        {
-            isPremium = true;
-        }
-      }
-
-      if (isAuthenticated === false)
-      {
-        const error = $('ul.message, li.error').text();
-        log.error('Authentication failed: ' + error);
-        process.exit(-1);
-      }
-
-      if (isPremium === false)
-      {
-          log.warn('Do not use this app without a premium account.');
-      }
-      else
-      {
-        log.info('You have a premium account! Good!');
-      }
-      done(null);
-    });
   });
 }
 
