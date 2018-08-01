@@ -23,12 +23,16 @@ interface IConfig {
   retry?: number;
   // Login options
   logUsingApi?: boolean;
+  logUsingCookie?: boolean;
   crSessionUrl?: string;
   crDeviceType?: string;
   crAPIVersion?: string;
   crLocale?: string;
   crSessionKey?: string;
   crLoginUrl?: string;
+  // Third method, injecting data from cookies
+  crUserId?: string;
+  crUserKey?: string;
   // Generated values
   crDeviceId?: string;
   crSessionId?: string;

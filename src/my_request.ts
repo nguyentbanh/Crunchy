@@ -16,6 +16,8 @@ const cookieStore = require('tough-cookie-file-store');
 // tslint:disable-next-line:no-var-requires
 const cloudscraper = require('cloudscraper');
 
+const CR_COOKIE_DOMAIN = 'http://crunchyroll.com';
+
 let isAuthenticated = false;
 let isPremium = false;
 
@@ -263,6 +265,25 @@ function authenticate(config: IConfig, done: (err: Error) => void)
             return done(errCheckAuth2);
           }
         });
+      });
+    }
+    else if (config.logUsingCookie)
+    {
+      j.setCookie(request.cookie('c_userid=' + config.crUserId + '; Domain=crunchyroll.com; HttpOnly; hostOnly=false;'),
+                  CR_COOKIE_DOMAIN);
+      j.setCookie(request.cookie('c_userkey=' + config.crUserKey + '; Domain=crunchyroll.com; HttpOnly; hostOnly=false;'),
+                  CR_COOKIE_DOMAIN);
+
+      checkIfUserIsAuth(config, (errCheckAuth2) =>
+      {
+        if (isAuthenticated)
+        {
+          return done(null);
+        }
+        else
+        {
+          return done(errCheckAuth2);
+        }
       });
     }
     else
