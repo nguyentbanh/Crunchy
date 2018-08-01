@@ -215,6 +215,11 @@ function pageScrape(config: IConfig, task: IConfigTask, done: (err: any, result?
       log.info('Checking availability for ' + title);
       const episodes: ISeriesEpisode[] = [];
 
+      if ($('.availability-notes-low').length || $('.availability-notes-high').length)
+      {
+        log.warn('This serie may have georestriction and some missings episode.');
+      }
+
       $('.episode').each((i, el) => {
         if ($(el).children('img[src*=coming_soon]').length) {
           return;
