@@ -21,6 +21,7 @@
     "no-any": false,
     "no-arg": true,
     "no-bitwise": true,
+    "prefer-conditional-expression": false,
     "space-within-parens": false,
     "no-object-literal-type-assertion": false,
     "no-console": [true,
