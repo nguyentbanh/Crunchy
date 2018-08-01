@@ -311,8 +311,67 @@ function authenticate(config: IConfig, done: (err: Error) => void)
     }
     else
     {
-      log.error('This method of login is currently unsupported...\n');
-      return done(AuthError('Unsupported login method'));
+      /* First get https://www.crunchyroll.com/login to get the login token */
+      const options =
+      {
+        headers: defaultHeaders,
+        jar: j,
+        gzip: false,
+        method: 'GET',
+        url: 'https://www.crunchyroll.com/login'
+      };
+
+      cloudscraper.request(options, (err: Error, rep: string, body: string) =>
+      {
+        if (err) return done(err);
+
+        const $ = cheerio.load(body);
+
+        /* Get the token from the login page */
+        const token = $('input[name="login_form[_token]"]').attr('value');
+        if (token === '')
+        {
+            return done(AuthError('Can\'t find token!'));
+        }
+
+        /* Now call the page again with the token and credentials */
+        const options =
+        {
+          headers: defaultHeaders,
+          form:
+          {
+            'login_form[name]': config.user,
+            'login_form[password]': config.pass,
+            'login_form[redirect_url]': '/',
+            'login_form[_token]': token
+          },
+          jar: j,
+          gzip: false,
+          method: 'POST',
+          url: 'https://www.crunchyroll.com/login'
+        };
+
+        cloudscraper.request(options, (err: Error, rep: string, body: string) =>
+        {
+          if (err)
+          {
+              return done(err);
+          }
+
+          /* Now let's check if we are authentificated */
+          checkIfUserIsAuth(config, (errCheckAuth2) =>
+          {
+            if (isAuthenticated)
+            {
+              return done(null);
+            }
+            else
+            {
+              return done(errCheckAuth2);
+            }
+          });
+        });
+      });
     }
 
   });
