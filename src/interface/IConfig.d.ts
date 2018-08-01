@@ -22,6 +22,7 @@ interface IConfig {
   unlog?: boolean;
   retry?: number;
   // Login options
+  userAgent?: string;
   logUsingApi?: boolean;
   logUsingCookie?: boolean;
   crSessionUrl?: string;

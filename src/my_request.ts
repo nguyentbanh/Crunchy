@@ -183,6 +183,11 @@ export function get(config: IConfig, options: string|request.Options, done: (err
     loadCookies(config);
   }
 
+  if (config.userAgent)
+  {
+    defaultHeaders['User-Agent'] = config.userAgent;
+  }
+
   authenticate(config, (err) =>
   {
     if (err)
@@ -207,6 +212,11 @@ export function post(config: IConfig, options: request.Options, done: (err: Erro
   if (j === undefined)
   {
     loadCookies(config);
+  }
+
+  if (config.userAgent)
+  {
+    defaultHeaders['User-Agent'] = config.userAgent;
   }
 
   authenticate(config, (err) =>
@@ -375,7 +385,6 @@ function authenticate(config: IConfig, done: (err: Error) => void)
         });
       });
     }
-
   });
 }
 
