@@ -57,6 +57,7 @@ export function save(config: IConfig)
   tmp.verbose = undefined;
   tmp.debug = undefined;
   tmp.unlog = undefined;
+  tmp.ignoredub = undefined;
 
   fs.writeFileSync(configFile, JSON.stringify(tmp, null, '  '));
 }

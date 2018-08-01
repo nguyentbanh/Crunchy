@@ -181,6 +181,7 @@ function pageScrape(config: IConfig, task: IConfigTask, done: (err: any, result?
     episodes.push({
       address: task.address.substr(1),
       episode: '',
+      seasonName: '',
       volume: 0,
       retry: config.retry,
     });
@@ -219,22 +220,31 @@ function pageScrape(config: IConfig, task: IConfigTask, done: (err: any, result?
           return;
         }
 
+        const season_name = $(el).closest('ul').prev('a').text();
         const volume = /([0-9]+)\s*$/.exec($(el).closest('ul').prev('a').text());
         const regexp = /Episode\s+((PV )?[S0-9][\-P0-9.]*[a-fA-F]?)\s*$/i;
         const episode = regexp.exec($(el).children('.series-title').text());
         const url = $(el).attr('href');
 
-        if ((!url) || (!episode)) {
+        if (config.ignoredub && (season_name.endsWith('Dub)') || season_name.endsWith('dub)')))
+        {
+          return;
+        }
+
+        if ((!url) || (!episode))
+        {
           return;
         }
         episodeCount += 1;
         episodes.push({
           address: url,
           episode: episode[1],
+          seasonName: season_name,
           volume: volume ? parseInt(volume[0], 10) : 1,
           retry: config.retry,
         });
       });
+
       if (episodeCount === 0)
       {
         log.warn('No episodes found for ' + title + '. Could it be a movie?');

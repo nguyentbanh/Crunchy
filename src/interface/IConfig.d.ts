@@ -12,6 +12,7 @@ interface IConfig {
   series?: string;
   nametmpl?: string;
   tag?: string;
+  ignoredub?: boolean;
   resolution?: string;
   video_format?: string;
   video_quality?: string;
