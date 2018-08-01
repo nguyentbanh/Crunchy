@@ -152,10 +152,12 @@ function checkIfUserIsAuth(config: IConfig, done: (err: Error) => void): void
 function loadCookies(config: IConfig)
 {
   const cookiePath = path.join(config.output || process.cwd(), '.cookies.json');
-  if(!fs.existsSync(cookiePath))
+
+  if (!fs.existsSync(cookiePath))
   {
-      fs.closeSync(fs.openSync(cookiePath, 'w'));
+    fs.closeSync(fs.openSync(cookiePath, 'w'));
   }
+
   j = request.jar(new cookieStore(cookiePath));
 }
 
@@ -163,10 +165,11 @@ export function eatCookies(config: IConfig)
 {
   const cookiePath = path.join(config.output || process.cwd(), '.cookies.json');
 
-  if(fs.existsSync(cookiePath))
+  if (fs.existsSync(cookiePath))
   {
       fs.removeSync(cookiePath);
   }
+
   j = undefined;
 }
 
@@ -190,6 +193,7 @@ export function get(config: IConfig, options: string|request.Options, done: (err
     cloudscraper.request(modify(options, 'GET'), (error: any, response: any, body: any) =>
     {
       if (error) return done(error);
+
       done(null, typeof body === 'string' ? body : String(body));
     });
   });
@@ -209,14 +213,14 @@ export function post(config: IConfig, options: request.Options, done: (err: Erro
   {
     if (err)
     {
-        return done(err);
+      return done(err);
     }
 
     cloudscraper.request(modify(options, 'POST'), (error: Error, response: any, body: any) =>
     {
       if (error)
       {
-         return done(error);
+        return done(error);
       }
       done(null, typeof body === 'string' ? body : String(body));
     });

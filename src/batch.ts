@@ -35,7 +35,8 @@ export default function(args: string[], done: (err?: Error) => void)
     config.pass = undefined;
     my_request.eatCookies(config);
     cfg.save(config);
-    log.info("Unlogged!");
+    log.info('Unlogged!');
+
     process.exit(0);
   }
 

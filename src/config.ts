@@ -3,7 +3,7 @@ import os = require('os');
 import fs = require('fs-extra');
 import path = require('path');
 
-const configFile = path.join(process.cwd(), "config.json");
+const configFile = path.join(process.cwd(), 'config.json');
 
 function fileExist(path: string)
 {
@@ -24,7 +24,7 @@ export function load(): IConfigLine
     const data = fs.readFileSync(configFile, 'utf8');
     return JSON.parse(data);
   }
-  
+
   return {args: undefined};
 }
 
