@@ -252,6 +252,8 @@ function authenticate(config: IConfig, done: (err: Error) => void)
       process.exit(-1);
     }
 
+    log.info('Seems we are not currently logged. Let\'s login!');
+
     if (config.logUsingApi)
     {
       if (config.crDeviceId === undefined)
