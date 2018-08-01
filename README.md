@@ -69,12 +69,14 @@ The [command-line interface](http://en.wikipedia.org/wiki/Command-line_interface
         -V, --version         output the version number
         -p, --pass <s>        The password.
         -u, --user <s>        The e-mail address or username.
+        -d, --unlog           Unlog
         -c, --cache           Disables the cache.
         -m, --merge           Disables merging subtitles and videos.
         -e, --episodes <s>    Episode list. Read documentation on how to use
         -f, --format <s>      The subtitle format. (default: ass)
         -o, --output <s>      The output path.
         -s, --series <s>      The series name override.
+        --ignoredub           Experimental: Ignore all seasons where the title end with 'Dub)'
         -n, --nametmpl <s>    Output name template (default: {SERIES_TITLE} - s{SEASON_NUMBER}e{EPISODE_NUMBER} - [{TAG}])
         -t, --tag <s>         The subgroup. (default: CrunchyRoll)
         -r, --resolution <s>  The video resolution. (valid: 360, 480, 720, 1080) (default: 1080)
@@ -87,6 +89,51 @@ The [command-line interface](http://en.wikipedia.org/wiki/Command-line_interface
 #### Batch-mode
 
 When no sequence of series addresses is provided, the batch-mode source file will be read (which is *CrunchyRoll.txt* in the current work directory. Each line in this file is processed contain the URL of a series and can support some of the command line parameter (like `-e`). This makes it ideal to manage a large sequence of series addresses.
+
+#### Configuration file
+
+Starting from version 1.4.0, Crunchy store some information in a config.json file. The file which is use have to be in the folder you are calling Crunchy. This is partly by design and a limitation on where Crunchy can find files.
+
+This file store some informations like your username and password.
+
+You don't need to create that file as Crunchy will create it for you, the first time you run it. Each run will update the content of the file, so it you run crunchy with your credential on the command line, it will add them to config file.
+
+There are some parameter that the config file can accept which are not created by default, and some of them are cannont be set form the command line parameter.
+
+Don't mess with them if you don't know what you are doing.
+
+Here are the list of valid parameter in the config file:
+
+ - Output options
+  * `merge` see `--merge`
+  * `format` see `--format`
+  * `output` see `--output`
+  * `nametmpl` see `--nametmpl`
+  * `tag` see `--tag`
+  * `resolution` see `--resolution`
+
+ - Login related options:
+  * `pass` see `--user`
+  * `user` see `--pass`
+  * `userAgent` set the user agent reported by Crunchy while crawling pages
+  * `logUsingApi`
+  * `logUsingCookie`
+  * `crSessionUrl`
+  * `crDeviceType`
+  * `crAPIVersion`
+  * `crLocale`
+  * `crSessionKey`
+  * `crLoginUrl`
+  * `crUserId`
+  * `crUserKey`
+
+ - Generated values: don't touch them:
+  * `crDeviceId`
+  * `crSessionId`
+
+Some of theses login related options are not going to be documented on what to put there for _legal_ reason.
+
+Crunchy will also create a `.cookie.jar` file in the output folder (by default the current folder) it is the file used by Crunchy to store the web cookies.
 
 #### Examples
 
@@ -142,8 +189,12 @@ Download episodes starting from 42 to the last available of *Tail Fairy*:
 
 * `-p or --pass <s>` sets the password.
 * `-u or --user <s>` sets the e-mail address or username.
+* `-d or --unlog` unlog
 
- _Please remember that login has to be done for each call of Crunchy, as none of the credentials are stored_
+_New in 1.4.0_: Crunchy remember between run about login information and other, so you need to passe the login and password only once
+I recommend to unlog if you see some problems during the run.
+
+*When you unlog, the cookie file is deleted as for some parameter in the config file (like username and password).*
 
 ##### Disables
 
@@ -159,6 +210,7 @@ Download episodes starting from 42 to the last available of *Tail Fairy*:
 * `-t or --tag <s>` sets The subgroup. (Default: CrunchyRoll)
 * `-r or --resolution <s>` sets the resolutoin you want to download (360, 480, 720, 1080)
 * `--retry <i>` set the number of try Crunchy will use if downloading a serie or episode fail
+* `--ignoredub` It is an experimental features that will ignore all season where the name ends with 'dub)'. The idea is to try to ignore dubbed season.
 
 ##### Others
 
