@@ -8,17 +8,20 @@ const current_version = pjson.version;
 
 /* Check if the current version is the latest */
 log.info('Crunchy version ' + current_version);
-request.get({ uri: 'https://raw.githubusercontent.com/Godzil/Crunchy/master/package.json' },
+request.get({ uri: 'https://box.godzil.net/getVersion.php?tool=crunchy&v=' + current_version },
                   (error: Error, response: any, body: any) =>
 {
   const onlinepkg = JSON.parse(body);
-  let tmp = current_version.split('.');
-  const cur = (Number(tmp[0]) * 10000) + (Number(tmp[1]) * 100) + Number(tmp[2]);
-  tmp = onlinepkg.version.split('.');
-  const dist = (Number(tmp[0]) * 10000) + (Number(tmp[1]) * 100) + Number(tmp[2]);
-  if (dist > cur)
+  if (onlinepkg.status = 'ok')
   {
-    log.warn('There is a newer version of crunchy (v' + onlinepkg.version + '), you should update!');
+    let tmp = current_version.split('.');
+    const cur = (Number(tmp[0]) * 10000) + (Number(tmp[1]) * 100) + Number(tmp[2]);
+    tmp = onlinepkg.version.split('.');
+    const dist = (Number(tmp[0]) * 10000) + (Number(tmp[1]) * 100) + Number(tmp[2]);
+    if (dist > cur)
+    {
+      log.warnMore('There is a newer version of crunchy (v' + onlinepkg.version + '), you should update!');
+    }
   }
 });
 
