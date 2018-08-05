@@ -66,7 +66,7 @@ function fileExist(path: string)
 
 function sanitiseFileName(str: string)
 {
-  return str.replace(/[\/':\?\*"<>\.]/g, '_');
+  return str.replace(/[\/':\?\*"<>\\\.]/g, '_');
 }
 
 /**
