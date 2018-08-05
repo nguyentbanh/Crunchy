@@ -3,6 +3,7 @@ import childProcess = require('child_process');
 import os = require('os');
 import path = require('path');
 
+import my_request = require('../my_request')
 import log  = require('../log');
 
 /**
@@ -24,7 +25,8 @@ export default function(rtmpUrl: string, rtmpInputPath: string, swfUrl: string, 
   else if (mode === 'HLS')
   {
       cmd = command('ffmpeg') + ' ' +
-          '-y -xerror ' +
+          '-user_agent "' + my_request.getUserAgent() + '" ' +
+          '-y -xerror -discard none ' +
           '-i "' + rtmpInputPath + '" ' +
           '-c copy -bsf:a aac_adtstoasc ' +
           '"' + filePath + '.mp4"';
