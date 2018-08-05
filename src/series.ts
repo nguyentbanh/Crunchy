@@ -215,9 +215,14 @@ function pageScrape(config: IConfig, task: IConfigTask, done: (err: any, result?
       log.info('Checking availability for ' + title);
       const episodes: ISeriesEpisode[] = [];
 
-      if ($('.availability-notes-low').length || $('.availability-notes-high').length)
+      if ($('.availability-notes-low').length)
       {
-        log.warn('This serie may have georestriction and some missings episode.');
+        log.warn('This serie may have georestriction and some missings episode (like some dubs) [Message: ' +  $('.availability-notes-low').text() + '].');
+      }
+
+      if ($('.availability-notes-high').length)
+      {
+        log.warnMore('This serie probably have georestriction and will miss some episodes [Message: ' +  $('.availability-notes-high').text() + '].');
       }
 
       $('.episode').each((i, el) => {
