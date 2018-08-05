@@ -26,6 +26,12 @@ export function warn(str: string)
   console.log(' \x1B[1;33m* WARN \x1B[0m: ' + str);
 }
 
+export function warnMore(str: string)
+{
+  /* Do fancy output */
+  console.log(' \x1B[1;38;5;166m* WARN \x1B[0m: ' + str);
+}
+
 export function dispEpisode(name: string, status: string, addNL: boolean)
 {
   /* Do fancy output */
