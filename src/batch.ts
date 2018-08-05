@@ -252,7 +252,15 @@ function checkURL(address: string): boolean
   {
     return true;
   }
-  if (address.startsWith('http:\/\/'))
+  if (address.startsWith('https:\/\/'))
+  {
+    return true;
+  }
+  if (address.startsWith('@http:\/\/'))
+  {
+    return true;
+  }
+  if (address.startsWith('@https:\/\/'))
   {
     return true;
   }
