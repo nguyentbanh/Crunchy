@@ -217,12 +217,14 @@ function pageScrape(config: IConfig, task: IConfigTask, done: (err: any, result?
 
       if ($('.availability-notes-low').length)
       {
-        log.warn('This serie may have georestriction and some missings episode (like some dubs) [Message: ' +  $('.availability-notes-low').text() + '].');
+        log.warn('This serie may have georestriction and some missings episode (like some dubs)' +
+                 ' [Message: ' +  $('.availability-notes-low').text() + '].');
       }
 
       if ($('.availability-notes-high').length)
       {
-        log.warnMore('This serie probably have georestriction and will miss some episodes [Message: ' +  $('.availability-notes-high').text() + '].');
+        log.warnMore('This serie probably have georestriction and will miss some episodes' +
+                     ' [Message: ' +  $('.availability-notes-high').text() + '].');
       }
 
       $('.episode').each((i, el) => {

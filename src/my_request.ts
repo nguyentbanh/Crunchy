@@ -178,7 +178,6 @@ export function getUserAgent(): string
   return defaultHeaders['User-Agent'];
 }
 
-
 /**
  * Performs a GET request for the resource.
  */

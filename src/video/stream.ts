@@ -3,7 +3,7 @@ import childProcess = require('child_process');
 import os = require('os');
 import path = require('path');
 
-import my_request = require('../my_request')
+import my_request = require('../my_request');
 import log  = require('../log');
 
 /**

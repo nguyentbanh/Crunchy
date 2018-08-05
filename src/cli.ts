@@ -12,7 +12,7 @@ request.get({ uri: 'https://box.godzil.net/getVersion.php?tool=crunchy&v=' + cur
                   (error: Error, response: any, body: any) =>
 {
   const onlinepkg = JSON.parse(body);
-  if (onlinepkg.status = 'ok')
+  if (onlinepkg.status === 'ok')
   {
     let tmp = current_version.split('.');
     const cur = (Number(tmp[0]) * 10000) + (Number(tmp[1]) * 100) + Number(tmp[2]);
