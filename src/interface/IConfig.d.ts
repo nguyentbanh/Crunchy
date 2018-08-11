@@ -7,6 +7,7 @@ interface IConfig {
   merge?: boolean;
   episodes?: string;
   // Settings
+  crlang?: string;
   format?: string;
   output?: string;
   series?: string;

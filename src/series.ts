@@ -1,12 +1,13 @@
 'use strict';
 import cheerio = require('cheerio');
 import episode from './episode';
-// import fs = require('fs');
 import fs = require('fs-extra');
 import my_request = require('./my_request');
 import path = require('path');
 import url = require('url');
 import log  = require('./log');
+import languages = require('./languages');
+
 const persistent = '.crpersistent';
 
 /**
@@ -234,7 +235,7 @@ function pageScrape(config: IConfig, task: IConfigTask, done: (err: any, result?
 
         const season_name = $(el).closest('ul').prev('a').text();
         const volume = /([0-9]+)\s*$/.exec($(el).closest('ul').prev('a').text());
-        const regexp = /Episode\s+((PV )?[S0-9][\-P0-9.]*[a-fA-F]?)\s*$/i;
+        const regexp = languages.get_epregexp(config);
         const episode = regexp.exec($(el).children('.series-title').text());
         const url = $(el).attr('href');
 

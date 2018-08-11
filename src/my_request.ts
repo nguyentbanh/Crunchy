@@ -6,6 +6,7 @@ import Promise = require('bluebird');
 import uuid = require('uuid');
 import path = require('path');
 import fs = require('fs-extra');
+import languages = require('./languages');
 import log = require('./log');
 
 import { RequestPromise } from 'request-promise';
@@ -110,6 +111,22 @@ function checkIfUserIsAuth(config: IConfig, done: (err: Error) => void): void
     }
 
     const $ = cheerio.load(body);
+
+    /* As we are here, try to detect which locale CR tell us */
+    const localeRE = /LOCALE = "([a-zA-Z]+)",/g;
+    const locale = localeRE.exec($('script').text())[1];
+    const countryCode = languages.localeToCC(locale);
+
+    if (config.crlang === undefined)
+    {
+      log.info('No locale set. Setting to the one reported by CR: "' + countryCode + '"');
+      config.crlang = countryCode;
+    }
+    else if (config.crlang !== countryCode)
+    {
+      log.warn('Crunchy is configured for locale "' + config.crlang + '" but CR report "' + countryCode + '" (LOCALE = ' + locale + ')');
+      log.warn('Check if it is correct or rerun (once) with "-l ' + countryCode + '" to correct.');
+    }
 
     /* Check if auth worked */
     const regexps = /ga\('set', 'dimension[5-8]', '([^']*)'\);/g;

@@ -349,6 +349,7 @@ function parse(args: string[]): IConfigLine
     // Episode filter
     .option('-e, --episodes <s>', 'Episode list. Read documentation on how to use')
     // Settings
+    .option('-l, --crlang <s>', 'CR page language (valid: en, fr, es, it, pt, de, ru).')
     .option('-f, --format <s>', 'The subtitle format.', 'ass')
     .option('-o, --output <s>', 'The output path.')
     .option('-s, --series <s>', 'The series name override.')
