@@ -239,7 +239,9 @@ function pageScrape(config: IConfig, task: IConfigTask, done: (err: any, result?
         const episode = regexp.exec($(el).children('.series-title').text());
         const url = $(el).attr('href');
 
-        if (config.ignoredub && (season_name.endsWith('Dub)') || season_name.endsWith('dub)')))
+        const igndub_re = languages.get_diregexp(config);
+
+        if (config.ignoredub && (igndub_re.exec(season_name)))
         {
           return;
         }

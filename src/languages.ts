@@ -23,6 +23,25 @@ export function localeToCC(locale: string): string
   return ret;
 }
 
+const dubignore_regexp: { [id: string]: RegExp; } =
+{
+  en: /\(.*Dub(?:bed)?.*\)|(?:\(RU\))/i,
+  fr: /\(.*Dub(?:bed)?.*\)|(?:\(RU\))|\(?Doublage.*\)?/,
+  de: /\(.*isch\)|\(Dubbed\)|\(RU\)/
+};
+
+export function get_diregexp(config: IConfig): RegExp
+{
+  let ret = dubignore_regexp.en;
+
+  if (config.crlang in dubignore_regexp)
+  {
+    ret = dubignore_regexp[config.crlang];
+  }
+
+  return ret;
+}
+
 const episodes_regexp: { [id: string]: RegExp; } =
 {
   en: /Episode\s+((OVA)|(PV )?[S0-9][\-P0-9.]*[a-fA-F]?)\s*$/i,
