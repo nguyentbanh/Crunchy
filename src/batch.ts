@@ -88,7 +88,7 @@ export default function(args: string[], done: (err?: Error) => void)
         return done(err);
     }
 
-    if (tasksArr[0].address === '')
+    if (!tasksArr || !tasksArr[0] || (tasksArr[0].address === ''))
     {
         return done();
     }
