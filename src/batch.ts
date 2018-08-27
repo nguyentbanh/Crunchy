@@ -33,6 +33,11 @@ export default function(args: string[], done: (err?: Error) => void)
     batchPath = path.normalize(path.join(process.cwd(), config.batch));
   }
 
+  if (config.nametmpl === undefined)
+  {
+    config.nametmpl = '{SERIES_TITLE} - s{SEASON_NUMBER}e{EPISODE_NUMBER} - {EPISODE_TITLE} - [{TAG}]';
+  }
+
   // Update the config file with new parameters
   cfg.save(config);
 
@@ -354,7 +359,7 @@ function parse(args: string[]): IConfigLine
     .option('-o, --output <s>', 'The output path.')
     .option('-s, --series <s>', 'The series name override.')
     .option('--ignoredub', 'Experimental: Ignore all seasons where the title end with \'Dub)\'')
-    .option('-n, --nametmpl <s>', 'Output name template', '{SERIES_TITLE} - s{SEASON_NUMBER}e{EPISODE_NUMBER} - {EPISODE_TITLE} - [{TAG}]')
+    .option('-n, --nametmpl <s>', 'Output name template')
     .option('-t, --tag <s>', 'The subgroup.', 'CrunchyRoll')
     .option('-r, --resolution <s>', 'The video resolution. (valid: 360, 480, 720, 1080)', '1080')
     .option('-b, --batch <s>', 'Batch file', 'CrunchyRoll.txt')
