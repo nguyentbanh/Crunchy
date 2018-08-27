@@ -11,17 +11,24 @@ log.info('Crunchy version ' + current_version);
 request.get({ uri: 'https://box.godzil.net/getVersion.php?tool=crunchy&v=' + current_version },
                   (error: Error, response: any, body: any) =>
 {
-  const onlinepkg = JSON.parse(body);
-  if (onlinepkg.status === 'ok')
+  if (response && (response.StatusCode === 200))
   {
-    let tmp = current_version.split('.');
-    const cur = (Number(tmp[0]) * 10000) + (Number(tmp[1]) * 100) + Number(tmp[2]);
-    tmp = onlinepkg.version.split('.');
-    const dist = (Number(tmp[0]) * 10000) + (Number(tmp[1]) * 100) + Number(tmp[2]);
-    if (dist > cur)
+    const onlinepkg = JSON.parse(body);
+    if (onlinepkg.status === 'ok')
     {
-      log.warnMore('There is a newer version of crunchy (v' + onlinepkg.version + '), you should update!');
+      let tmp = current_version.split('.');
+      const cur = (Number(tmp[0]) * 10000) + (Number(tmp[1]) * 100) + Number(tmp[2]);
+      tmp = onlinepkg.version.split('.');
+      const dist = (Number(tmp[0]) * 10000) + (Number(tmp[1]) * 100) + Number(tmp[2]);
+      if (dist > cur)
+      {
+        log.warnMore('There is a newer version of crunchy (v' + onlinepkg.version + '), you should update!');
+      }
     }
+  }
+  else
+  {
+    log.info('Cannot check version.');
   }
 });
 
